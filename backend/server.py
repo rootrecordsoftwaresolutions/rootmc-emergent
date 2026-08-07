@@ -10,7 +10,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core import seed_if_empty
-from routers import auth, market, portfolio, public, rewards
+from routers import auth, market, portfolio, public, rewards, ava
 
 
 @asynccontextmanager
