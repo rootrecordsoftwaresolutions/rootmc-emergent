@@ -26,7 +26,7 @@ export default function Rewards() {
         <h2 className="font-display font-bold text-xl">Sign in to claim rewards</h2>
         <p className="text-sm text-text-secondary">Daily check-in and vote rewards debit the treasury directly to your wallet.</p>
         <button
-          onClick={() => nav("/auth")}
+          onClick={() => nav("/rootmc/auth")}
           className="mx-auto rounded-md bg-gold text-black font-bold px-6 py-3"
           data-testid="rewards-signin-btn"
         >

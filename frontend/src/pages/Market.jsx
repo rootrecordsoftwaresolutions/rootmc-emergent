@@ -147,7 +147,7 @@ export default function Market() {
             return (
               <button
                 key={it.id}
-                onClick={() => nav(`/market/${it.ticker}`)}
+                onClick={() => nav(`/rootmc/market/${it.ticker}`)}
                 data-testid={`market-row-${it.ticker}`}
                 className="w-full grid grid-cols-[1fr_auto_auto] items-center gap-3 px-3 py-3 hover:bg-bg-elev/60 transition-colors text-left"
               >

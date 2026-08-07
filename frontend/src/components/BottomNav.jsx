@@ -4,11 +4,11 @@ import { Home, LineChart, Wallet, Gift, MoreHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 
 const items = [
-  { to: "/", label: "Home", icon: Home, testId: "nav-home" },
-  { to: "/market", label: "Market", icon: LineChart, testId: "nav-market" },
-  { to: "/portfolio", label: "Portfolio", icon: Wallet, testId: "nav-portfolio" },
-  { to: "/rewards", label: "Rewards", icon: Gift, testId: "nav-rewards" },
-  { to: "/more", label: "More", icon: MoreHorizontal, testId: "nav-more" },
+  { to: "/rootmc", label: "Home", icon: Home, testId: "nav-home" },
+  { to: "/rootmc/market", label: "Market", icon: LineChart, testId: "nav-market" },
+  { to: "/rootmc/portfolio", label: "Portfolio", icon: Wallet, testId: "nav-portfolio" },
+  { to: "/rootmc/rewards", label: "Rewards", icon: Gift, testId: "nav-rewards" },
+  { to: "/rootmc/more", label: "More", icon: MoreHorizontal, testId: "nav-more" },
 ];
 
 export default function BottomNav() {
@@ -21,7 +21,7 @@ export default function BottomNav() {
     >
       <ul className="grid grid-cols-5">
         {items.map(({ to, label, icon: Icon, testId }) => {
-          const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+          const active = to === "/rootmc" ? pathname === "/rootmc" || pathname === "/rootmc/" : pathname.startsWith(to);
           return (
             <li key={to}>
               <NavLink

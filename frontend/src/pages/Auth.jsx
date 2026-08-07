@@ -42,7 +42,7 @@ export default function Auth() {
       const { data } = await api.post("/auth/link/complete", { code: code.trim().toUpperCase() });
       login(data.token, data.user);
       toast.success(`Linked as ${data.user.minecraft_username}`);
-      nav("/", { replace: true });
+      nav("/rootmc", { replace: true });
     } catch (e) {
       toast.error(e?.response?.data?.detail || "Invalid or expired code.");
     } finally {
