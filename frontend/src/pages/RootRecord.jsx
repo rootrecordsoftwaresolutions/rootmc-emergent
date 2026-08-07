@@ -1,7 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight, CloudLightning, Flame, Briefcase, Target, Palmtree } from "lucide-react";
 import EcosystemNav from "../components/EcosystemNav";
+import RRSubnav from "../components/RRSubnav";
 
 const fr = { fontFamily: "'Fraunces', Georgia, serif" };
 const ge = { fontFamily: "'Geist', system-ui, sans-serif" };
@@ -71,7 +73,7 @@ export default function RootRecord() {
         active="rootrecord"
         theme={{ bar: "rgba(244,240,231,0.82)", border: "rgba(11,31,42,0.12)", text: "rgba(11,31,42,0.55)", activeText: INK, accent: MOSS }}
       />
-
+      <RRSubnav active="home" />
       {/* HERO */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 pb-14 grid lg:grid-cols-[1.1fr_.9fr] gap-12 items-center">
         <div>
@@ -190,13 +192,17 @@ export default function RootRecord() {
             Browse products, review pricing, or jump to your account to manage a subscription. Want something custom? Request an app build.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="https://rootrecord.info/" target="_blank" rel="noopener noreferrer" data-testid="rr-cta-visit"
+            <Link to="/rootrecord/pricing" data-testid="rr-cta-pricing"
               className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold text-[#0B1F2A]" style={{ background: "#fff" }}>
-              Visit rootrecord.info <ArrowUpRight size={16} />
-            </a>
+              See pricing — one membership <ArrowRight size={16} />
+            </Link>
+            <Link to="/rootrecord/about" data-testid="rr-cta-about"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold" style={{ border: "1px solid rgba(255,255,255,0.25)", color: "#fff" }}>
+              About RootRecord
+            </Link>
             <a href="https://account.rootrecord.info/" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold" style={{ border: "1px solid rgba(255,255,255,0.25)", color: "#fff" }}>
-              Account hub <ArrowRight size={16} />
+              Account hub <ArrowUpRight size={16} />
             </a>
           </div>
         </div>

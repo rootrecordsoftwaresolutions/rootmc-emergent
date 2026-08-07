@@ -33,5 +33,7 @@ RootMC nested routes (inside RootMCApp): `''`, `market`, `market/:ticker`, `port
 ## Backlog / next
 - P1: Silence React Router v7 future-flag warnings (opt-in flags on BrowserRouter).
 - P2: Post-login RootMC redirect briefly shows OFFLINE badge before next status poll (cosmetic).
-- P2: Deepen RootRecord/Ava with more sub-pages (pricing, about, Ava status embed) if desired.
+- P2: Deepen RootRecord/Ava with more sub-pages (FAQ, contact, Ava status embed) if desired.
+- Added 2026-08-07: RootRecord `/rootrecord/pricing` + `/rootrecord/about` with shared RRSubnav;
+  "one membership for everything on our networks" (Lifetime spans RootRecord + RootMC).
 - P2: Switch RootMC to live api.rootmc.net (REACT_APP_USE_MOCK=false) for production.
