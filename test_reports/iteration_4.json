@@ -1,0 +1,33 @@
+{
+  "summary": "First test iteration after merging RootMC + RootRecord + Ava into one unified React portal. Full backend regression + full frontend cross-brand navigation smoke passed. Backend: 38/38 pytest suites PASS against preview REACT_APP_BACKEND_URL. Frontend Playwright: all 12 review scenarios PASS end-to-end - Portal '/' renders portal-page + ecosystem-nav with all 4 eco-links; portal CTAs and world cards navigate to /rootrecord, /rootmc, /ava correctly; /rootrecord renders all 5 product cards (business, weather, kilauea, goals, hawaii) with EcosystemNav; /ava renders all 4 checked atlas cards (core, surfaces, rootmc, root-record) with EcosystemNav; /rootmc loads with data-testid=rootmc-app showing LIVE server status and 27 online plus live market ticker (BEAC/ELYT/SPWN) confirming /api/economy /api/market /api/server-status calls succeed; BottomNav testids all present (bottom-nav, nav-home, nav-market, nav-portfolio, nav-rewards, nav-more) and all navigate within /rootmc namespace with correct URLs; /rootmc/market shows 18 market rows, clicking market-row-BEAC navigates to /rootmc/market/BEAC and renders market-detail; topbar-root-link navigates from /rootmc back to '/' Portal; /rootmc/auth demo /link flow works - username input, request code (auth-issued-code populated e.g. '96Q6XU' via POST /api/auth/link/start -> 200), auth-complete-btn (POST /api/auth/link/complete -> 200) logs in and redirects to /rootmc with rootmc-app mounted. Zero uncaught JS pageerrors; only benign React Router v7 future-flag warnings in console. No 502s. All /api/* endpoints observed returning 200 through the preview ingress.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/rootmc Home immediately after link-complete redirect", "issues": ["Server status badge briefly shows 'OFFLINE' with '--' stats after successful link before the next /api/server/status poll fills in 27 ONLINE. Cosmetic only - resolves within a few seconds as SyncBadge refetches. Consider seeding server state into the redirect handler or showing a 'Loading...' state instead of 'OFFLINE'."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "App.jsx routes are clean: '/', '/rootrecord', '/ava', '/rootmc/*', with a wildcard fallback to Portal. Good separation between marketing pages (Portal/RootRecord/Ava) and the RootMC sub-app which owns its own nested Routes.",
+    "EcosystemNav appears on all four sections and correctly cross-links between the four brands - verified from Portal, RootRecord, Ava, and inside /rootmc via topbar-root-link. Good pattern reuse.",
+    "BottomNav uses absolute /rootmc-prefixed paths which prevents route pollution when the RootMC app is nested under /rootmc/*. Confirmed nav-home lands at exactly /rootmc, other nav-* items land at /rootmc/{market|portfolio|rewards|more}.",
+    "Auth /link demo flow (REACT_APP_DEMO_LINK=true + REACT_APP_USE_MOCK=true) works end-to-end via mock backend. The auth-complete transition takes ~2-4s (network + AuthProvider hydration); consider adding a spinner state on the redirect target if UX polish is desired - not blocking.",
+    "React Router v6 future-flag warnings (v7_startTransition, v7_relativeSplatPath) are logged - trivial to silence by opting in future flags on the router. Cosmetic only.",
+    "No pydantic/pydantic-core mismatch observed - the pinned pydantic-core==2.27.1 is holding. All 38 pytest suites pass in ~3.3s indicating snappy backend.",
+    "Portal/RootRecord/Ava pages appear to be static marketing pages with no API calls - no error states or loading states needed. Ecosystem nav is the only interactive element and it works."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (38/38)", "frontend": "100% (12/12 review scenarios across Portal + 3 brand sections + RootMC nested routes + auth flow)"},
+  "test_credentials": "None - demo /link mode (REACT_APP_DEMO_LINK=true). Test users linked this run: MergeQaBot, MergeQaBot2 (via Playwright). Backend pytest also creates its own TEST_* users.",
+  "seed_data_creation": "Backend auto-seeds via core.seed_if_empty() on FastAPI startup - market items, economy overview, server status, daily report, leaderboards. Unchanged from prior iterations.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The merge is stable. All four sections (/, /rootrecord, /ava, /rootmc/*) route correctly and share EcosystemNav. RootMC nested routes work under /rootmc/* using relative Routes inside RootMCApp.jsx. When testing auth-complete redirect, allow at least 10-12s for the wait_for_url or wait_for_selector('[data-testid=rootmc-app]') - the first test attempt with an 8s timeout falsely reported FAIL while the flow was actually completing (verified in a second run). Backend URL for /api tests: use REACT_APP_BACKEND_URL from frontend/.env (https://emergant-core.preview.emergentagent.com). All /api/* endpoints are prefixed correctly; there is no bare /api/server endpoint - it is /api/server/status. Auth route inside /rootmc is /rootmc/auth (NOT /rootmc/link).",
+  "rca of the issue": "N/A - no functional bugs. The single design nit about the OFFLINE badge on post-login redirect is a poll-timing artifact (SyncBadge fetches on a short interval), not a bug."
+}
