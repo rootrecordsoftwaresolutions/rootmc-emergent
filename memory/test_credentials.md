@@ -1,24 +1,12 @@
-# Test Credentials — RootMC Terminal
+# Test credentials
 
-## Auth model
-The PWA uses the RootMC in-game `/link` flow — a 6-character code exchanged for a JWT.  
-**No email/password. No pre-seeded users.**
+## RootMC (in-app `/link` demo auth)
+- No fixed username/password. RootMC uses Minecraft `/link` code flow.
+- Preview runs with `REACT_APP_USE_MOCK=true` and `REACT_APP_DEMO_LINK=true`:
+  go to `/rootmc/auth`, enter any Minecraft username (3–16 chars), click "Request code".
+  A demo 6-char code is issued and pre-filled; click "Complete link" to sign in.
+- No external API keys required for the preview (mock FastAPI backend serves /api/*).
 
-## Demo mode (current backend)
-- Endpoint: `POST /api/auth/link/start` with `{ "minecraft_username": "<any 3-16 char name>" }`
-- Response includes the 6-char code (in production it would be issued in-game and hidden).
-- Endpoint: `POST /api/auth/link/complete` with `{ "code": "ABC123" }` returns `{ token, user }`.
-- The Auth screen pre-fills the code from step 1, so you can complete the flow with two taps.
-
-## To sign in as a test player
-1. Open the app → tap **Sign in with /link**.
-2. Enter any Minecraft username (e.g. `QaBot`, `Notch`, `TestPlayer`).
-3. Tap **Request code** → the code auto-populates the code field.
-4. Tap **Complete link** → you're in.
-
-Each new username creates a fresh player with deterministic randomized wallet/inventory/shops/holdings (seeded from the username hash — same name always returns the same player).
-
-## Suggested demo accounts for screenshots / demos
-- `Notch` — largest starting portfolio
-- `GoldMiner` — mid-tier player with 3 holdings
-- `QaBot` — automated testing user
+## RootRecord / Ava
+- Static marketing/wiki sections. External product links (Google Play, *.rootrecord.info,
+  ava.rootmc.net) point to real production and open in new tabs — no auth needed on this site.
