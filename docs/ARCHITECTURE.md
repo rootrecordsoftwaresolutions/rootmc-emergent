@@ -4,28 +4,28 @@
 
 ```
 rootmc-emergent/
-├── web/                          # Cloudflare Pages (rootmc-web)
+├── web/                          # rootmc.net Pages
+├── sites/
+│   ├── rootrecord-main/          # rootrecord.info (archived dump)
+│   ├── rootrecord-solana/        # live solana-rootrecord-site
+│   ├── rootrecord-ava/           # Ava wiki / status Worker
+│   └── rootrecord-merged/
 ├── api/
-│   ├── rootmc-api/               # Deployable Worker (gateway + wrangler + D1 migrations apply)
-│   ├── rootmc-api-g2/            # Gen-2 / experimental Worker
-│   ├── rootmc-realm-api/         # Business logic (imported by worker)
-│   ├── shared/                   # Vendored RootRecord shared TS
-│   └── rootrecord-api-account/   # Vendored account shard (auth, FCM, SQL migrations)
-├── edge/
-│   ├── rootmc-ava-edge/          # Ava public edge (chat relay)
-│   ├── rootmc-webstat-proxy/
-│   └── rootmc-minecraft-map/
-├── apps/
-│   ├── rootmc-app/
-│   ├── rootmc-ava/
-│   ├── rootmc-sexi/
-│   └── rootmc-ava-desktop/
-├── android/                      # Kotlin Compose app
+│   ├── rootmc-api/               # api.rootmc.net gateway
+│   ├── rootmc-api-g2/
+│   ├── rootmc-realm-api/
+│   ├── shared/
+│   ├── rootrecord-primary/       # RootRecord primary Worker
+│   └── rootrecord-api-*          # account, business, goals, kilauea, token, weather, …
+├── edge/                         # RootMC Ava edge, map, webstat
+├── apps/                         # rootmc-* + RootRecord product *-web apps
+├── android/
+├── archive/                      # pre-august / dated full dumps (diff only)
 ├── frontend/ + backend/          # Emergent PWA preview
 └── docs/
 ```
 
-Condensed from `workstations/rootmc/Web Files` via `scripts/export-emergent-repo.sh` (no node_modules).
+Condensed from live `Web Files` + `cloudflare/` + `projects/` + `rootrecord/` plus `mirrors/web-files-repo` archives via `scripts/export-emergent-repo.sh` (no node_modules).
 
 ## Request routing
 
