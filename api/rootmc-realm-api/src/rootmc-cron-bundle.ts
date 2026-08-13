@@ -3,7 +3,12 @@
  */
 import type { ExecutionContext } from "@cloudflare/workers-types";
 import type { Env } from "./realm-router";
-import { previousHstDayKey, resolveServerId, isHstMidnightHour } from "./rootmc-daily-report";
+import {
+  previousHstDayKey,
+  resolveServerId,
+  isHstDailyReportHour,
+  isAfterHstDailyReportOpen,
+} from "./rootmc-daily-report";
 import { expireDueProposals, processGrantProposalMajorityHold } from "./rootmc-community-proposals";
 import { maybeRunLegislatureCron } from "./rootmc-legislature";
 import { evaluateShopPriceAlerts } from "./rootmc-shop-alerts";
@@ -38,7 +43,8 @@ async function settle<T>(p: Promise<T>): Promise<{ ok: boolean; value?: T; error
   }
 }
 
-async function maybeRunDailyReports(env: Env, when: Date): Promise<void> {
+async function maybeRunDailyReports(env: Env, when: Date, opts: { force?: boolean } = {}): Promise<void> {
+  if (!opts.force && !isAfterHstDailyReportOpen(when)) return;
   const throughDayKey = previousHstDayKey(when);
   const serverId = await resolveServerId(env.DB);
   const { runFullDailyReportSuite, runMissingDailyCategoryReports } = await import("./rootmc-daily-report-runner");
@@ -71,7 +77,7 @@ async function maybeRunWeeklyReports(env: Env, when: Date): Promise<void> {
 export async function runRootMcCronBundle(
   env: Env,
   ctx: ExecutionContext | undefined,
-  opts: { job: CronBundleJob; when: Date; force?: boolean; reason?: string },
+  opts: { job: CronBundleJob; when: Date; force?: boolean; dailyOnly?: boolean; reason?: string },
 ): Promise<Record<string, unknown>> {
   if (isG2Worker(env)) return { skipped: true, reason: "g2_worker" };
   const wait = waiter(ctx);
@@ -103,20 +109,22 @@ export async function runRootMcCronBundle(
         ),
       );
     }
-    out.dailyCatchup = await settle(maybeRunDailyReports(env, when));
+    out.dailyCatchup = await settle(maybeRunDailyReports(env, when, { force: Boolean(opts.force) }));
     out.weeklyRetry = await settle(maybeRunWeeklyReports(env, when));
   }
 
   if (job === "hourly" || job === "all-tick") {
-    if (isMonthlyDividendCronSlot(when) || opts.force) {
+    if (!opts.dailyOnly && (isMonthlyDividendCronSlot(when) || opts.force)) {
       out.dividend = await settle(runMonthlyTreasuryDividendCron(env));
     }
-    if (isHstMidnightHour(when) || opts.force) {
-      out.dailyMidnight = await settle(maybeRunDailyReports(env, when));
+    if (isHstDailyReportHour(when) || opts.force || opts.dailyOnly) {
+      out.dailyMidnight = await settle(maybeRunDailyReports(env, when, { force: Boolean(opts.force || opts.dailyOnly) }));
     }
-    out.webstat = await settle(runWebstatPullCron(env));
-    out.liveEconomy = await settle(runLiveEconomyStatusPost(env));
-    out.weeklyRetry = await settle(maybeRunWeeklyReports(env, when));
+    if (!opts.dailyOnly) {
+      out.webstat = await settle(runWebstatPullCron(env));
+      out.liveEconomy = await settle(runLiveEconomyStatusPost(env));
+      out.weeklyRetry = await settle(maybeRunWeeklyReports(env, when));
+    }
   }
 
   if (job === "weekly" || (job === "all-tick" && opts.force)) {

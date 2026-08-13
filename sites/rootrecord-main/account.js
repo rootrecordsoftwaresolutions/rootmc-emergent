@@ -1543,6 +1543,10 @@
       }
       stripSecurityQueryFromUrl();
       setStatus("Password reset. You are signed in with your new password.", "ok");
+      if (pageMode() === "reset") {
+        window.location.href = "/account";
+        return;
+      }
       await refreshMe();
     } catch {
       setStatus("Could not reset password. Try again.", "err");
@@ -1652,7 +1656,7 @@
       }
       if (document.body && document.body.getAttribute("data-account-page") === "signup") {
         const ret = new URLSearchParams(window.location.search).get("return");
-        const dest = ret && String(ret).startsWith("/") ? String(ret) : "/account.html";
+        const dest = ret && String(ret).startsWith("/") ? String(ret) : "/account";
         window.location.href = dest;
         return;
       }
@@ -1745,6 +1749,13 @@
 
   window.addEventListener("DOMContentLoaded", async () => {
     const page = pageMode();
+    if (page === "login") {
+      const qs = new URLSearchParams(window.location.search);
+      if (qs.get("reset_token")) {
+        window.location.replace("/account-reset" + window.location.search + window.location.hash);
+        return;
+      }
+    }
     if (page === "billing") {
       showBillingPanel("loading");
     } else if (page === "my-apps") {
@@ -1764,6 +1775,11 @@
       setStatus("We could not load this page. Please refresh and try again.", "err");
       if (page === "signup") {
         const pf = el("panel-signup");
+        if (pf) pf.hidden = false;
+        const pl = el("panel-loading");
+        if (pl) pl.hidden = true;
+      } else if (page === "reset") {
+        const pf = el("panel-forms");
         if (pf) pf.hidden = false;
         const pl = el("panel-loading");
         if (pl) pl.hidden = true;
@@ -1816,6 +1832,22 @@
       el("form-signup")?.addEventListener("submit", onSignup);
       const ps = el("panel-signup");
       if (ps) ps.hidden = false;
+      const pl = el("panel-loading");
+      if (pl) pl.hidden = true;
+      return;
+    }
+
+    if (page === "reset") {
+      el("form-password-reset-request")?.addEventListener("submit", onPasswordResetRequest);
+      el("form-password-reset-confirm")?.addEventListener("submit", onPasswordResetConfirm);
+      const resetToken = String(new URLSearchParams(window.location.search).get("reset_token") || "").trim();
+      if (resetToken) {
+        const input = el("reset-token");
+        if (input) input.value = resetToken;
+        setStatus("Enter a new password to finish the reset.", "ok");
+      }
+      const pf = el("panel-forms");
+      if (pf) pf.hidden = false;
       const pl = el("panel-loading");
       if (pl) pl.hidden = true;
       return;

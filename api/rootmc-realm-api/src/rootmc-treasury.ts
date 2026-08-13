@@ -607,7 +607,7 @@ export const TREASURY_TYPE_GLOSSARY: { type: string; direction: "inflow" | "outf
   { type: "OPENING", direction: "inflow", label: "Opening balance (pre-ledger /eco give before /grant tracking)" },
   { type: "TAX", direction: "inflow", label: "Transaction Taxes" },
   { type: "DEATH", direction: "inflow", label: "PvP death fees (Server Reserve share)" },
-  { type: "TOWNY_SINK", direction: "inflow", label: "Server fees (Towny claims, outposts, founding, service fees)" },
+  { type: "TOWNY_SINK", direction: "inflow", label: "Server fees" },
   { type: "LOAN_PRINCIPAL", direction: "inflow", label: "Loan repaid" },
   { type: "LOAN_INTEREST", direction: "inflow", label: "Loan Interest" },
   { type: "BOND_ISSUE", direction: "inflow", label: "Bonded note deposits" },

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ export default function Rewards() {
   }
 
   return (
-    <div className="px-4 pt-4 space-y-4" data-testid="rewards-screen">
+    <div className="px-4 md:px-6 pt-4 md:pt-6 space-y-4" data-testid="rewards-screen">
       <div>
         <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-text-secondary">Earn</div>
         <h1 className="font-display font-extrabold text-3xl tracking-tight">Rewards</h1>
@@ -94,6 +94,7 @@ function CheckInTab({ refreshUser }) {
   const [celebrate, setCelebrate] = useState(false);
   const [tick, setTick] = useState(0);
   const loadedAtRef = React.useRef(Date.now());
+  void tick; // forces countdown re-render each second
 
   useEffect(() => {
     api.get("/checkin/status").then(({ data }) => {
@@ -235,6 +236,7 @@ function VoteTab({ refreshUser }) {
   const [claiming, setClaiming] = useState(null);
   const [tick, setTick] = useState(0);
   const loadedAtRef = React.useRef(Date.now());
+  void tick; // forces cooldown re-render each second
   const [pending, setPending] = useState({}); // siteId -> boolean (visited, can claim)
 
   const load = () =>

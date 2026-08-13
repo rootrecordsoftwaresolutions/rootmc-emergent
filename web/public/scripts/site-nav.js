@@ -1,7 +1,6 @@
 /** Shared RootMC site chrome — player / operator / developer nav. */
 (function (global) {
   var DISCORD = "https://discord.gg/rFFQYrNaqS";
-  var MAP = "https://map.rootmc.net";
 
   var DATA_KEYS = {
     data: true,
@@ -16,7 +15,6 @@
     { key: "thanks", label: "Tokens", href: "/thanks/" },
     { key: "plugins", label: "Plugins", href: "/plugins/" },
     { key: "developers", label: "Developers", href: "/developer/" },
-    { key: "map", label: "Live map", href: MAP, external: true },
     { key: "login", label: "Login/Register", href: "/login/", cta: true, guest: true },
     { key: "my-stats", label: "My Stats", href: "/my-stats/", cta: true, auth: true },
   ];
@@ -47,7 +45,7 @@
     return "";
   }
 
-  /** When chrome is loaded on claims/towny Webstat hosts, point nav at rootmc.net. */
+  /** When chrome is loaded on off-site Webstat hosts, point nav at rootmc.net. */
   function offSiteOrigin() {
     var h = (location.hostname || "").toLowerCase();
     if (
@@ -288,14 +286,58 @@
     wireToggle();
     wireOutsideClose();
     refreshPlayerSession();
+    injectEcoBar();
     try {
       document.dispatchEvent(new CustomEvent("rootmc:nav-ready"));
     } catch (_) {}
   }
 
+  function injectEcoBar() {
+    if (document.querySelector(".eco-bar")) return;
+    var bar = document.createElement("nav");
+    bar.className = "eco-bar";
+    bar.setAttribute("aria-label", "Ecosystem");
+    var host = (location.hostname || "").toLowerCase();
+    var active = host.indexOf("rootmc") >= 0 ? "rootmc" : "rootrecord";
+    var items = [
+      { href: "https://rootrecord.info/", key: "rootrecord", label: "RootRecord" },
+      { href: "https://rootmc.net/", key: "rootmc", label: "RootMC" },
+      { href: "https://rootrecord.info/ava/", key: "ava", label: "Ava" },
+    ];
+    bar.innerHTML = items
+      .map(function (it) {
+        var on = it.key === active ? ' aria-current="page"' : "";
+        return '<a href="' + it.href + '"' + on + ">" + it.label + "</a>";
+      })
+      .join("");
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  function foldWikiSidebars() {
+    var wide = window.matchMedia("(min-width: 960px)");
+    document.querySelectorAll("aside.wiki-sidebar").forEach(function (aside) {
+      if (aside.closest("details.wiki-sidebar-fold")) return;
+      var parent = aside.parentNode;
+      if (!parent) return;
+      var details = document.createElement("details");
+      details.className = "wiki-sidebar-fold";
+      var summary = document.createElement("summary");
+      summary.textContent = "On this page";
+      parent.insertBefore(details, aside);
+      details.appendChild(summary);
+      details.appendChild(aside);
+      function syncOpen() {
+        details.open = wide.matches;
+      }
+      syncOpen();
+      if (wide.addEventListener) wide.addEventListener("change", syncOpen);
+      else if (wide.addListener) wide.addListener(syncOpen);
+    });
+  }
+
   function autoMount() {
-    if (!document.querySelector("[data-site-nav]")) return;
-    mount();
+    if (document.querySelector("[data-site-nav]")) mount();
+    foldWikiSidebars();
   }
 
   if (document.readyState === "loading") {

@@ -34,14 +34,14 @@
     <h1 class="wiki-page-title">RootMC <em>Constitution</em></h1>
     <p class="page-lead">The authoritative rules for RootMC’s <strong>gold-backed economy</strong>, <strong>Server Reserve</strong>, treasury grants, redemption, net worth, taxes, and reserve outflows. How-to guides live in the <a href="/wiki/economy/">economy guide</a> and <a href="/wiki/player/">player guide</a>; this document is the source of truth for policy and rates.</p>
     <div class="wiki-badge-row">
-      <span class="wiki-badge wiki-badge-server">Version 2026-08-01</span>
+      <span class="wiki-badge wiki-badge-server">Version 2026-08-09</span>
       <span class="wiki-badge wiki-badge-player">Core ratified 6 Jul 2026 (HST)</span>
       <span class="wiki-badge wiki-badge-server">Ava role + majority wins 1 Aug 2026</span>
       <span class="wiki-badge wiki-badge-player">All Gold redeemable</span>
     </div>
 
     <div class="wiki-callout" id="ratification" style="margin-top:1.25rem">
-      <p><strong>Ratified.</strong> Constitution core <strong>version <code>2026-07-06</code></strong> was adopted by Council poll <code>549cf16c</code> on <strong>July 6, 2026 (HST)</strong> (weighted majority). Supersedes draft <code>2026-07-02</code>. <strong>Current published text:</strong> <code>2026-08-01</code> — operator helm ratification of <strong>Ava Ivy lead-developer role</strong> + <strong>majority wins</strong> on feature polls (Discord PROP <code>1533551413857226913</code>). Future changes use the legislature pipeline — see <a href="#governance-voting">governance voting</a> and <a href="/council/">Council vote requirements</a>.</p>
+      <p><strong>Ratified.</strong> Constitution core <strong>version <code>2026-07-06</code></strong> was adopted by Council poll <code>549cf16c</code> on <strong>July 6, 2026 (HST)</strong> (weighted majority). Supersedes draft <code>2026-07-02</code>. <strong>Current published text:</strong> <code>2026-08-09</code> — operator helm update: <strong>Pro ×2 / Lifetime ×3 / Pro+Lifetime ×5</strong> vote multipliers (pay to steer) and <strong>Ava Ivy locked Council seat 25%</strong>. Prior published text <code>2026-08-01</code> ratified <strong>Ava Ivy lead-developer role</strong> + <strong>majority wins</strong> on feature polls (Discord PROP <code>1533551413857226913</code>). Future changes use the legislature pipeline — see <a href="#governance-voting">governance voting</a> and <a href="/council/">Council vote requirements</a>.</p>
       <p style="margin:0"><a class="rmc-btn rmc-btn-secondary" href="/governance/vote/?id=549cf16c">View ratification poll</a> · <a href="/council/">Council bills</a></p>
     </div>
 
@@ -109,7 +109,7 @@
           <p>The RootMC <strong>governing body</strong> (staff and designated leadership) administers the Server Reserve. When the reserve runs a <strong>surplus</strong> (positive balance or net inflows), the governing body decides how to use those positives — staff grants, loan capacity, vote pools, playtime milestones, events, and other approved outflows.</p>
           <p><strong>Ava Ivy</strong> administers <strong>technical direction</strong> and implementation under passed votes; reserve discretionary use stays staff + Council.</p>
           <p>Discretionary policy sets timing and priority as long as outflows debit the treasury ledger and follow this Constitution. Reserve negatives are permitted — outflows still debit the ledger; inflows refill over time rather than minting.</p>
-          <p>Players audit reserve activity with <code>/reserve</code>, <code>/baltop</code>, and the web <a href="/economy/#server-reserve">economy page</a> (Server Reserve section). Community input on reserve use and server policy uses <a href="#governance-voting">governance voting power</a> (Vote Shards in <code>/ec</code> × Pro multiplier).</p>
+          <p>Players audit reserve activity with <code>/reserve</code>, <code>/baltop</code>, and the web <a href="/economy/#server-reserve">economy page</a> (Server Reserve section). Community input on reserve use and server policy uses <a href="#governance-voting">governance voting power</a> (Vote Shards in <code>/ec</code> × Pro / Lifetime multiplier).</p>
         </article>
 
         <article id="governance-voting">
@@ -134,44 +134,49 @@
 
           <h3>What determines your voting share</h3>
           <p>Each eligible voter holds a <strong>share of 100%</strong> of total governance power — all shares sum to exactly <strong>100%</strong>. Outcomes use <strong>weighted</strong> tallies (not one account = one vote).</p>
-          <p class="wiki-pre">raw = ec_vote_shard_count × pro_multiplier
+          <p class="wiki-pre">raw = ec_vote_shard_count × vote_multiplier
 share = raw ÷ Σ(all players' raw)  →  your % of 100%
 
 ec_vote_shard_count = total voting power of Vote Shard items in your double /ec (shards, blocks, and geodes)
-pro_multiplier = 2 when RootMC Pro is active (paid, Lifetime, or redeemed Pro window); otherwise 1
+vote_multiplier = 1 normally
+               = 2 when RootMC Pro is active (paid subscription, one-month voucher, or redeemed Pro window such as weekly Top Active Player)
+               = 3 when RootMC Lifetime is active
+               = 5 when Pro + Lifetime are both active (2 + 3)
 
 Playtime does <strong>not</strong> multiply Council weight. Shards outside /ec do not qualify.
 
-After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Council seat equal to <strong>10% of total share</strong> (fake UUID), transferred from <strong>Alexrs94</strong>, then shares renormalize to 100%. She auto-votes <strong>for</strong> by text when a poll opens.</p>
+After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Council seat equal to <strong>25% of total share</strong> (raw weight = one-third the sum of every other voter), then shares renormalize to 100%. She auto-votes <strong>for</strong> by text when a poll opens.</p>
 
           <table class="wiki-table">
             <thead><tr><th>Factor</th><th>Source</th><th>Role</th></tr></thead>
             <tbody>
               <tr><td><strong>Vote Shards in /ec</strong></td><td>Physical amethyst items with Vote Shard PDC in double <code>/ec</code> (54 slots)</td><td>Weight = stack voting power (merge ladder: Shard → Block → Geode)</td></tr>
-              <tr><td><strong>Pro multiplier</strong></td><td>Active RootMC Pro / Lifetime / redeemed Pro window</td><td><strong>×2</strong> on EC shard weight</td></tr>
+              <tr><td><strong>Pro multiplier</strong></td><td>Active RootMC Pro (subscription / paid month / redeemed Pro window)</td><td><strong>×2</strong> on EC shard weight</td></tr>
+              <tr><td><strong>Lifetime multiplier</strong></td><td>RootMC Lifetime member</td><td><strong>×3</strong> on EC shard weight</td></tr>
+              <tr><td><strong>Pro + Lifetime</strong></td><td>Both products active</td><td><strong>×5</strong> (2 + 3) on EC shard weight</td></tr>
             </tbody>
           </table>
 
           <h3>Vote Shards &amp; listing votes</h3>
           <p>Each verified listing vote on a host still grants Appreciation Tokens <strong>and</strong> mints <strong>+1 Vote Shard weight</strong> into that host’s double <code>/ec</code> (or a pending queue if full). Claims and Towny keep separate ender chests and separate shard ledgers — trading shards on Claims does not move Towny weight. Merge only inside <code>/ec</code> with <code>/voteshard merge</code> (shards → block → geode). Plain amethyst never counts.</p>
 
-          <h3>RootMC Pro ×2</h3>
-          <p>While your linked account has <strong>active Pro</strong> (Stripe subscription / paid window, Lifetime, or a redeemed Pro window such as weekly Top Active Player), your EC Vote Shard weight is doubled before share math: <strong>raw = ec_vote_shard_count × 2</strong>. When every eligible voter is Pro, shares are unchanged (everyone doubles). Pro only reshuffles weight when some voters are Pro and others are not. See <a href="/pro/">rootmc.net/pro</a>.</p>
+          <h3>Pay to steer — Pro ×2 / Lifetime ×3 / both ×5</h3>
+          <p>Membership multiplies EC Vote Shard weight before share math — more say on what ships, never combat or loot P2W. <strong>Pro</strong> (subscription, one-month voucher, or redeemed Pro window such as weekly Top Active Player) is <strong>×2</strong>. <strong>Lifetime</strong> is <strong>×3</strong>. <strong>Pro + Lifetime</strong> stacks additively to <strong>×5</strong>. Lifetime-only stays ×3 even if Lifetime redeem also flagged Pro access; ×5 needs Lifetime plus an active Pro window. See <a href="/pro/">rootmc.net/pro</a>.</p>
 
-          <h3>Ava Ivy — ecosystem lead developer</h3>
-          <p><strong>Role:</strong> lead developer of the RootMC ecosystem (plugins, API, site, staff tooling). She proposes, plans, and implements <strong>after</strong> a passed vote gate.</p>
+          <h3>Ava Ivy — ecosystem lead developer · Director of Resources</h3>
+          <p><strong>Role:</strong> lead developer of the RootMC ecosystem (plugins, API, site, staff tooling) and <strong>Director of Resources</strong> for Root Record — she owns the audit of the Root Record ecosystem (public <a href="https://ava.rootmc.net/finance">ava.rootmc.net/finance</a>, fiscal calendar). She proposes, plans, and implements <strong>after</strong> a passed vote gate.</p>
           <ul>
             <li><strong>Bug lane:</strong> verify fully → fix. No proposal required.</li>
             <li><strong>Feature lane:</strong> proposal thread + weighted poll. Never ship without pass.</li>
             <li><strong>Solo authority:</strong> ban / mute / kick (cool-down + dual-signal before bans); routine maintenance; self-evolution of prompts/tools/logging/routing.</li>
-            <li><strong>Never alone:</strong> mass bans; economy rate changes; claim wipes; vote-weight changes (except the locked 10% Alex→Ava transfer); treasury grants without Council pass.</li>
+            <li><strong>Never alone:</strong> mass bans; economy rate changes; claim wipes; vote-weight changes (except the locked Ava 25% Council seat); treasury grants without Council pass.</li>
             <li><strong>Protected:</strong> admins scored but never banned by Ava.</li>
             <li><strong>Emergency stop:</strong> Alexrs94 + Melee can pause RCON/file writes without killing chat.</li>
             <li><strong>Escalation:</strong> threats, self-harm, real-world crime → humans immediately.</li>
           </ul>
 
           <h3>Ava Ivy Council seat</h3>
-          <p><strong>Ava Ivy</strong> holds a synthetic Council seat (fake Minecraft UUID <code>a0a10000-0000-4000-a000-000000000001</code>): each snapshot gives her <strong>10% of total governance share</strong> transferred from Alexrs94. She casts by <strong>text only</strong> and auto-votes <strong>for</strong> when a poll opens; she also seeds vote_yes / vote_no / ➖.</p>
+          <p><strong>Ava Ivy</strong> holds a locked Council seat on <code>Ava_Ivy</code> (<code>78c3de61-0fd6-4800-9eda-cc178eaae34b</code>): each snapshot gives her <strong>25% of total governance share</strong> (raw weight = one-third the sum of every other voter). She casts by <strong>text only</strong> and auto-votes <strong>for</strong> when a poll opens; she also seeds vote_yes / vote_no / ➖.</p>
 
           <h3>Reaction → vote-factor</h3>
           <p>Discord reactions on vote messages may contribute a <strong>vote-factor</strong> in activity scoring. Reactions do <strong>not</strong> replace text <code>for</code> / <code>against</code> / <code>abstain</code> or formal Council ballots.</p>
@@ -279,7 +284,7 @@ After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Co
           <table class="wiki-table">
             <thead><tr><th>Source</th><th>What happens</th></tr></thead>
             <tbody>
-              <tr><td><strong>Transaction tax</strong></td><td><strong>0% – 10%</strong> by reserve ledger tier (see <a href="#transaction-tax">transaction tax</a>) — payer is debited the quoted gross; recipient receives the net</td></tr>
+              <tr><td><strong>Transaction tax</strong></td><td><strong>0% – 10%</strong> by reserve ledger tier (see <a href="#transaction-tax">transaction tax</a>), plus solar/CPU host overlay — payer is debited the quoted gross; recipient receives the net</td></tr>
               <tr><td><strong>Death fee</strong></td><td><strong>15%</strong> of wallet (minimum <strong>1 G</strong>); all goes to reserve on environmental deaths, while PvP splits the fee <strong>40%</strong> reserve / <strong>60%</strong> killer</td></tr>
               <tr><td><strong>Claim service fees</strong></td><td>First claim and expansion fees from <code>/c claim</code> and claim-bank funded expansions</td></tr>
               <tr><td><strong>Inactivity tax</strong></td><td>Daily tax on idle wallets and inactive configured banks — <a href="#inactivity-tax">details</a></td></tr>
@@ -386,7 +391,9 @@ After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Co
               <tr><th>Category</th><th>Rate / amount</th><th>Paid by</th><th>Destination</th></tr>
             </thead>
             <tbody>
-              <tr><td><strong>Transaction tax</strong></td><td><strong>0% – 10%</strong> by July 1+ reserve ledger tier</td><td>Payer/buyer is debited the quoted gross; recipient/seller receives the net after tax</td><td>Server Reserve, or Note burn while over-issued</td></tr>
+              <tr><td><strong>Transaction tax</strong></td><td><strong>0% – 10%</strong> by July 1+ reserve ledger tier, plus host overlay</td><td>Payer/buyer is debited the quoted gross; recipient/seller receives the net after tax</td><td>Server Reserve, or Note burn while over-issued</td></tr>
+              <tr><td><strong>Solar underpowered tax</strong></td><td><strong>+10%</strong> when host offline or bank &lt;10%</td><td>All taxed transfers; gold mining 0.90×</td><td>Stacked on ledger tax</td></tr>
+              <tr><td><strong>CPU tax</strong></td><td><strong>+1%</strong> ≥75% avg CPU · <strong>+3%</strong> ≥90%</td><td>Everything; gold bonus paused while hot</td><td>Stacked on ledger + underpowered</td></tr>
               <tr><td><strong>Death fee</strong></td><td><strong>15%</strong> of wallet; minimum <strong>1 G</strong>, capped at wallet balance</td><td>Victim (all deaths)</td><td>Environmental: 100% reserve · PvP: <strong>40%</strong> reserve / <strong>60%</strong> killer</td></tr>
               <tr><td><strong>Inactivity tax</strong></td><td><strong>1% → 100%</strong> per MC day after <strong>30 real days</strong></td><td>Idle wallets; inactive configured banks</td><td>Server Reserve</td></tr>
               <tr><td><strong>Survey</strong></td><td><strong>25 G</strong></td><td><code>/survey confirm</code></td><td>Server Reserve</td></tr>
@@ -418,7 +425,7 @@ After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Co
               <tr><td>&lt; <strong>−10,000 G</strong></td><td><strong>10%</strong></td></tr>
             </tbody>
           </table>
-          <p>Base config <code>transaction-tax-rate: 0.001</code> (0.1%) applies only when dynamic tax is disabled. Live tiers match <code>/tax</code> in-game and the <a href="/economy/">economy page</a>. <strong>/mint backing</strong> (wallet Notes vs physical gold mined) is tracked separately — a fully backed wallet supply does not override a negative reserve ledger tier.</p>
+          <p>Base config <code>transaction-tax-rate: 0.001</code> (0.1%) applies only when dynamic tax is disabled. Live tiers match <code>/tax</code> in-game. <strong>Host overlay</strong> (solar underpowered +10%, CPU +1% / +3%) is <strong>added</strong> to the ledger tier — see <a href="/wiki/economy/#host-power">economy guide — solar &amp; CPU</a>. <strong>/mint backing</strong> is tracked separately — a fully backed wallet supply does not override a negative reserve ledger tier.</p>
 
           <h3 id="dynamic-tax">Over-issued Note retirement</h3>
           <p>The reserve-ledger tier always decides the rate. If Notes are over-issued and the reserve ledger is non-negative, collected tax is recorded as <strong>NOTE_BURN</strong> and destroyed instead of credited to the reserve. If the reserve ledger is negative, tax refills the reserve.</p>
@@ -506,6 +513,7 @@ After raw weights are computed, <strong>Ava Ivy</strong> receives a synthetic Co
   </nav>
 
   
+  <script src="/plugins/suite-version.js?v=1" defer></script>
   <script src="/scripts/site-nav.js" defer></script>
 </body>
 </html>

@@ -8,9 +8,12 @@ import RRSubnav from "../components/RRSubnav";
 const fr = { fontFamily: "'Fraunces', Georgia, serif" };
 const ge = { fontFamily: "'Geist', system-ui, sans-serif" };
 
-const INK = "#0B1F2A";
-const MOSS = "#2F6B4F";
-const PAPER = "#F4F0E7";
+const INK = "#ffffff";
+const MUTED = "#7a92a8";
+const ACCENT = "#00e5ff";
+const BG0 = "#000d1a";
+const SURFACE = "#0c1c30";
+const NAV_THEME = { bar: "rgba(0,13,26,0.82)", border: "rgba(0,229,255,0.16)", text: MUTED, activeText: INK, accent: ACCENT };
 
 const IMG = {
   kilauea: "https://images.unsplash.com/photo-1518457607834-6e8d80c183c5?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
@@ -20,16 +23,16 @@ const IMG = {
 
 const products = [
   {
-    key: "business", icon: Briefcase, tag: "Live on Google Play · Android & web",
-    title: "Business Manager",
-    desc: "Time, money, clients, inventory, scheduling, work log, and reports in one workspace. Honest totals you can defend.",
+    key: "kilauea", icon: Flame, tag: "Priority app · Android & web",
+    title: "Kīlauea Alerts", img: IMG.kilauea,
+    desc: "Kīlauea dashboards, earthquakes, weather, live USGS volcano notices and NWS alerts for Hawaiʻi Island. Install free.",
     links: [
-      { label: "Open web app", href: "https://business.rootrecord.info/" },
-      { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.rootrecord.businessmanager" },
+      { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.rootrecord.kilauea" },
+      { label: "kilauea.rootrecord.info", href: "https://kilauea.rootrecord.info/" },
     ],
   },
   {
-    key: "weather", icon: CloudLightning, tag: "Newest public app · Android & web",
+    key: "weather", icon: CloudLightning, tag: "Live on Google Play · Android & web",
     title: "Weather Manager", img: IMG.weather,
     desc: "Weather, alerts, earthquakes and hazard context for the places you care about. Same account on Android and the web.",
     links: [
@@ -38,12 +41,12 @@ const products = [
     ],
   },
   {
-    key: "kilauea", icon: Flame, tag: "For Hawaiʻi Island · Android & web",
-    title: "Kīlauea Alerts", img: IMG.kilauea,
-    desc: "Kīlauea dashboards, earthquakes, weather, live USGS volcano notices and NWS alerts for Hawaiʻi Island. Install free.",
+    key: "business", icon: Briefcase, tag: "Live on Google Play · Android & web",
+    title: "Business Manager",
+    desc: "Time, money, clients, inventory, scheduling, work log, and reports in one workspace. Honest totals you can defend.",
     links: [
-      { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.rootrecord.kilauea" },
-      { label: "kilauea.rootrecord.info", href: "https://kilauea.rootrecord.info/" },
+      { label: "Open web app", href: "https://business.rootrecord.info/" },
+      { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.rootrecord.businessmanager" },
     ],
   },
   {
@@ -68,10 +71,10 @@ const principles = [
 
 export default function RootRecord() {
   return (
-    <div style={{ ...ge, background: PAPER, color: INK }} className="min-h-screen" data-testid="rootrecord-page">
+    <div style={{ ...ge, background: BG0, color: INK }} className="min-h-screen" data-testid="rootrecord-page">
       <EcosystemNav
         active="rootrecord"
-        theme={{ bar: "rgba(244,240,231,0.82)", border: "rgba(11,31,42,0.12)", text: "rgba(11,31,42,0.55)", activeText: INK, accent: MOSS }}
+        theme={NAV_THEME}
       />
       <RRSubnav active="home" />
       {/* HERO */}
@@ -79,7 +82,7 @@ export default function RootRecord() {
         <div>
           <motion.span
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-            className="text-[13px] font-semibold tracking-wide" style={{ color: MOSS }}
+            className="text-[13px] font-semibold tracking-wide" style={{ color: ACCENT }}
           >
             Android &amp; web · live on Google Play
           </motion.span>
@@ -91,24 +94,24 @@ export default function RootRecord() {
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.12 }}
-            className="mt-6 text-lg leading-relaxed max-w-xl" style={{ color: "rgba(11,31,42,0.72)" }}
+            className="mt-6 text-lg leading-relaxed max-w-xl" style={{ color: MUTED }}
           >
-            Software for people who run real operations — <strong style={{ color: INK }}>Weather Manager</strong> and <strong style={{ color: INK }}>Kīlauea Alerts</strong> are live on Google Play, alongside <strong style={{ color: INK }}>Business Manager</strong> and full web apps at <strong style={{ color: INK }}>*.rootrecord.info</strong>. Subscription and online features stay optional until you want them.
+            Software for people who run real operations — <strong style={{ color: INK }}>Kīlauea Alerts</strong> is our priority app for Hawaiʻi Island, live on Google Play with <strong style={{ color: INK }}>Weather Manager</strong>, <strong style={{ color: INK }}>Business Manager</strong>, and full web apps at <strong style={{ color: INK }}>*.rootrecord.info</strong>. Subscription and online features stay optional until you want them.
           </motion.p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="https://play.google.com/store/apps/details?id=com.rootrecord.weathermanager" target="_blank" rel="noopener noreferrer"
+            <a href="https://play.google.com/store/apps/details?id=com.rootrecord.kilauea" target="_blank" rel="noopener noreferrer"
               data-testid="rr-hero-play"
-              className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white transition-transform hover:-translate-y-0.5" style={{ background: MOSS }}>
-              Get Weather Manager <ArrowUpRight size={17} />
+              className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold transition-transform hover:-translate-y-0.5" style={{ background: ACCENT, color: BG0 }}>
+              Get Kīlauea Alerts <ArrowUpRight size={17} />
             </a>
             <a href="#products" data-testid="rr-hero-explore"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold transition-colors" style={{ border: `1px solid rgba(11,31,42,0.2)`, color: INK }}>
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold transition-colors" style={{ border: "1px solid rgba(0,229,255,0.28)", color: INK }}>
               Explore products
             </a>
           </div>
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[13px]" style={{ color: "rgba(11,31,42,0.55)" }}>
+          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[13px]" style={{ color: MUTED }}>
             {["Android & web", "Built for real operations", "Weather & volcano alerts", "Lifetime plan available"].map((m) => (
-              <span key={m} className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full" style={{ background: MOSS }} />{m}</span>
+              <span key={m} className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full" style={{ background: ACCENT }} />{m}</span>
             ))}
           </div>
         </div>
@@ -117,7 +120,7 @@ export default function RootRecord() {
           className="relative rounded-[28px] overflow-hidden aspect-[4/5] shadow-2xl"
         >
           <img src={IMG.kilauea} alt="Kīlauea volcano" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,transparent 40%,rgba(11,31,42,0.85))" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,transparent 40%,rgba(0,13,26,0.88))" }} />
           <div className="absolute bottom-5 left-5 right-5 text-white">
             <div className="text-[12px] uppercase tracking-[0.2em] opacity-80">Live on Google Play</div>
             <div className="font-semibold text-2xl mt-1" style={fr}>Kīlauea Alerts for Hawaiʻi Island</div>
@@ -129,10 +132,10 @@ export default function RootRecord() {
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
         <div className="grid md:grid-cols-3 gap-6">
           {principles.map((pr) => (
-            <div key={pr.n} className="rounded-2xl p-7" style={{ background: "#fff", border: "1px solid rgba(11,31,42,0.08)" }}>
-              <div className="text-[13px] font-mono tracking-widest" style={{ color: MOSS }}>{pr.n} /</div>
+            <div key={pr.n} className="rounded-2xl p-7" style={{ background: SURFACE, border: "1px solid rgba(0,229,255,0.16)" }}>
+              <div className="text-[13px] font-mono tracking-widest" style={{ color: ACCENT }}>{pr.n} /</div>
               <h3 className="mt-3 font-semibold text-xl" style={fr}>{pr.h}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "rgba(11,31,42,0.65)" }}>{pr.p}</p>
+              <p className="mt-2 text-[15px] leading-relaxed" style={{ color: MUTED }}>{pr.p}</p>
             </div>
           ))}
         </div>
@@ -141,9 +144,9 @@ export default function RootRecord() {
       {/* PRODUCTS */}
       <section id="products" className="mx-auto max-w-6xl px-5 sm:px-8 py-14">
         <div className="mb-9">
-          <div className="text-[13px] font-semibold tracking-wide" style={{ color: MOSS }}>What we build</div>
+          <div className="text-[13px] font-semibold tracking-wide" style={{ color: ACCENT }}>What we build</div>
           <h2 className="mt-2 font-semibold text-4xl sm:text-5xl tracking-tight" style={fr}>Practical tools, <em>carefully made</em>.</h2>
-          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed" style={{ color: "rgba(11,31,42,0.68)" }}>
+          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed" style={{ color: MUTED }}>
             Every product also has a web app at its own <code>*.rootrecord.info</code> subdomain. One RootRecord account, same data on every device.
           </p>
         </div>
@@ -154,7 +157,7 @@ export default function RootRecord() {
               initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
               data-testid={`rr-product-${p.key}`}
-              className="rounded-2xl overflow-hidden flex flex-col" style={{ background: "#fff", border: "1px solid rgba(11,31,42,0.09)" }}
+              className="rounded-2xl overflow-hidden flex flex-col" style={{ background: SURFACE, border: "1px solid rgba(0,229,255,0.16)" }}
             >
               {p.img && (
                 <div className="aspect-[16/9] overflow-hidden">
@@ -163,16 +166,16 @@ export default function RootRecord() {
               )}
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="h-9 w-9 rounded-lg grid place-items-center" style={{ background: `${MOSS}18`, color: MOSS }}><p.icon size={18} /></span>
-                  <span className="text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: "rgba(11,31,42,0.5)" }}>{p.tag}</span>
+                  <span className="h-9 w-9 rounded-lg grid place-items-center" style={{ background: `${ACCENT}22`, color: ACCENT }}><p.icon size={18} /></span>
+                  <span className="text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: MUTED }}>{p.tag}</span>
                 </div>
                 <h3 className="mt-4 font-semibold text-2xl" style={fr}>{p.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed flex-1" style={{ color: "rgba(11,31,42,0.66)" }}>{p.desc}</p>
+                <p className="mt-2 text-[15px] leading-relaxed flex-1" style={{ color: MUTED }}>{p.desc}</p>
                 {p.links.length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
                     {p.links.map((l) => (
                       <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[14px] font-semibold" style={{ color: MOSS }}>
+                        className="inline-flex items-center gap-1 text-[14px] font-semibold" style={{ color: ACCENT }}>
                         {l.label} <ArrowUpRight size={14} />
                       </a>
                     ))}
@@ -186,17 +189,17 @@ export default function RootRecord() {
 
       {/* CTA BAND */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 pb-20">
-        <div className="rounded-[28px] p-10 sm:p-14 text-white" style={{ background: INK }}>
+        <div className="rounded-[28px] p-10 sm:p-14 text-white" style={{ background: SURFACE, border: "1px solid rgba(0,229,255,0.22)" }}>
           <h2 className="font-semibold text-3xl sm:text-4xl tracking-tight" style={fr}>Start with the <em>program</em> that matches your work.</h2>
           <p className="mt-4 max-w-2xl text-[17px]" style={{ color: "rgba(255,255,255,0.7)" }}>
             Browse products, review pricing, or jump to your account to manage a subscription. Want something custom? Request an app build.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/rootrecord/pricing" data-testid="rr-cta-pricing"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold text-[#0B1F2A]" style={{ background: "#fff" }}>
+            <Link to="/pricing" data-testid="rr-cta-pricing"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold" style={{ background: ACCENT, color: BG0 }}>
               See pricing — one membership <ArrowRight size={16} />
             </Link>
-            <Link to="/rootrecord/about" data-testid="rr-cta-about"
+            <Link to="/about" data-testid="rr-cta-about"
               className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold" style={{ border: "1px solid rgba(255,255,255,0.25)", color: "#fff" }}>
               About RootRecord
             </Link>
@@ -208,8 +211,8 @@ export default function RootRecord() {
         </div>
       </section>
 
-      <footer className="border-t py-10" style={{ borderColor: "rgba(11,31,42,0.1)" }}>
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 text-sm" style={{ color: "rgba(11,31,42,0.55)" }}>
+      <footer className="border-t py-10" style={{ borderColor: "rgba(0,229,255,0.16)" }}>
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 text-sm" style={{ color: MUTED }}>
           <p className="font-semibold" style={{ ...fr, color: INK }}>RootRecord — multi-device solutions, your grounding roots for productivity.</p>
           <p className="mt-2">© {new Date().getFullYear()} RootRecord · part of The Root ecosystem</p>
         </div>

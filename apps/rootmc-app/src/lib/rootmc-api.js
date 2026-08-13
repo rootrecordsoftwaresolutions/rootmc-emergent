@@ -29,7 +29,7 @@ rootmcApi.interceptors.request.use((config) => {
 export const rootmc = {
   // server + status
   serverStatus: () => rootmcApi.get("/api/rootmc/server/featured"),
-  serverConfig: () => rootmcApi.get("/api/mobile/config"),
+  serverConfig: () => rootmcApi.get("/api/rootmc/config"),
 
   // economy
   treasury: () => rootmcApi.get("/api/rootmc/treasury/rootmc"),

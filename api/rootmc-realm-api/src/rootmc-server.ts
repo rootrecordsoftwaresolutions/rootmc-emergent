@@ -67,24 +67,24 @@ export const REALM_PLUGIN_BASE = ROOTMC_PLUGINS;
 /** Published plugin jars (remote server pulls via RootMC heartbeat  -  no SSH). */
 export const PLUGIN_RELEASES = {
   rootmc: {
-    version: "1.8.0",
-    filename: "rootmc-1.8.0.jar",
-    url: `${REALM_PLUGIN_BASE}/rootmc-1.8.0.jar`,
+    version: "1.8.112",
+    filename: "rootmc-1.8.112.jar",
+    url: `${REALM_PLUGIN_BASE}/rootmc-1.8.112.jar`,
   },
   root_essentials: {
-    version: "1.8.0",
-    filename: "root-essentials-1.8.0.jar",
-    url: `${REALM_PLUGIN_BASE}/root-essentials-1.8.0.jar`,
+    version: "1.8.111",
+    filename: "root-essentials-1.8.111.jar",
+    url: `${REALM_PLUGIN_BASE}/root-essentials-1.8.111.jar`,
   },
   root_core: {
-    version: "1.8.0",
-    filename: "root-core-1.8.0.jar",
-    url: `${REALM_PLUGIN_BASE}/root-core-1.8.0.jar`,
+    version: "1.8.112",
+    filename: "root-core-1.8.112.jar",
+    url: `${REALM_PLUGIN_BASE}/root-core-1.8.112.jar`,
   },
   root_skills: {
-    version: "1.8.0",
-    filename: "root-skills-1.8.0.jar",
-    url: `${REALM_PLUGIN_BASE}/root-skills-1.8.0.jar`,
+    version: "1.8.111",
+    filename: "root-skills-1.8.111.jar",
+    url: `${REALM_PLUGIN_BASE}/root-skills-1.8.111.jar`,
   },
 } as const;
 
@@ -98,7 +98,7 @@ export const FEATURED_SERVER_DEFAULTS = {
   server_name: "RootMC",
   server_address: FEATURED_SERVER_ADDRESS,
   default_world_name: "RootMC",
-  game_version: "26.2",
+  game_version: "26.3",
   map_url: ROOTMC_MAP_URL as string | null,
   verify_url: ROOTMC_VERIFY,
   realm_url: ROOTMC_REALM_HOME,

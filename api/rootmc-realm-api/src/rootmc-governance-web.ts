@@ -22,6 +22,10 @@ import {
 } from "./rootmc-legislature";
 import {
   AVA_COUNCIL_DISCORD_ID,
+  AVA_COUNCIL_UUID,
+  LIFETIME_VOTE_MULTIPLIER,
+  PRO_PLUS_LIFETIME_VOTE_MULTIPLIER,
+  PRO_VOTE_MULTIPLIER,
   governancePowerForUuid,
   isGovernanceEligible,
   computeGovernancePowerSnapshot,
@@ -567,8 +571,11 @@ export async function handleGovernanceWebRoutes(
         total_votes: r.total_votes,
         vote_points: r.vote_points,
         ec_vote_shard_count: r.ec_vote_shard_count,
+        paid_vote_shards: r.paid_vote_shards ?? 0,
+        site_multiplier: r.site_multiplier ?? 1,
         effective_vote_points: r.effective_vote_points,
         is_pro: r.is_pro,
+        is_lifetime: r.is_lifetime,
         pro_multiplier: r.pro_multiplier,
         playtime_seconds: r.playtime_seconds,
         sites_voted: r.sites_voted,
@@ -576,19 +583,22 @@ export async function handleGovernanceWebRoutes(
       })),
       polls,
       policy: {
-        formula: "ec_vote_shard_count x pro_multiplier (then Alex→Ava 10% total-share seat)",
+        formula:
+          "(EC shards + paid shards + lifetime vote-site bonus) x vote_multiplier (Pro x2, Lifetime x3, Pro+Lifetime x5; Lifetime vote-sites x2; then Ava locked seat = 25%)",
         share_note:
-          "Each eligible voter holds a share of 100% — all shares sum to exactly 100%. Weight is Vote Shards in double /ec (not playtime). Active RootMC Pro doubles EC shard weight (×2) — pay to steer (more say on proposals), not pay-to-win combat/economy power. Ava Ivy holds a synthetic Council seat (fake UUID) equal to 10% of total share, transferred from Alexrs94. She auto-votes for by text when a poll opens; Discord buttons are retired.",
+          "Each eligible voter holds a share of 100% — all shares sum to exactly 100%. Vote score = /ec shards + paid shards ($1=100, Stripe) + Lifetime ×2 on listing votes. Not weekly awards. Pay to steer: Pro ×2, Lifetime ×3, Pro+Lifetime ×5 — more say on proposals, not pay-to-win. Ava_Ivy holds a locked Council seat equal to 25% of total share at all times.",
         vote_points_baseline: VOTE_POINT_BASELINE,
-        vote_points_from: "ec_vote_shards_in_double_enderchest",
-        pro_multiplier: 2,
+        vote_points_from: "ec_shards_plus_paid_shards",
+        pro_multiplier: PRO_VOTE_MULTIPLIER,
+        lifetime_multiplier: LIFETIME_VOTE_MULTIPLIER,
+        pro_plus_lifetime_multiplier: PRO_PLUS_LIFETIME_VOTE_MULTIPLIER,
         pro_note:
-          "Active Pro / Lifetime / redeemed Pro window → EC Vote Shard weight ×2 before share renormalization. Framing: pay to steer — supporters get higher vote authority on what ships; never combat/loot P2W.",
+          "Pay to steer: Pro ×2, Lifetime ×3, Pro+Lifetime ×5. Paid Pro only (500 shards/mo). Lifetime 3000 shards one-time + vote-site ×2. Weekly awards do not grant shards. Never combat/loot P2W.",
         ava_transfer: {
           from: "Alexrs94",
           to: "Ava Ivy",
-          share_of_total: 0.1,
-          minecraft_uuid: "a0a10000-0000-4000-a000-000000000001",
+          share_of_total: 0.25,
+          minecraft_uuid: AVA_COUNCIL_UUID,
           discord_user_id: AVA_COUNCIL_DISCORD_ID,
           auto_vote: "for",
         },

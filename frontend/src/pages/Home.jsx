@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { fmtG, fmtPct, deltaColor } from "../lib/format";
+import { fmtG, fmtPct } from "../lib/format";
 import Sparkline from "../components/Sparkline";
 import SyncBadge from "../components/SyncBadge";
 import PullIndicator from "../components/PullIndicator";
@@ -52,7 +52,7 @@ export default function Home() {
   const losers = [...market].sort((a, b) => a.change_24h_pct - b.change_24h_pct).slice(0, 4);
 
   return (
-    <motion.div {...fade} className="px-4 pt-4 space-y-6 relative" data-testid="home-screen">
+    <motion.div {...fade} className="px-4 md:px-6 pt-4 md:pt-6 space-y-6 relative" data-testid="home-screen">
       <PullIndicator {...ptr} />
       {/* Greeting / Signed-in state */}
       {user ? (
@@ -116,7 +116,7 @@ export default function Home() {
         </div>
         <SyncBadge syncedAt={syncedAt} />
       </div>
-      <div className="grid grid-cols-2 gap-3 !mt-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 !mt-2">
         <PulseCard
           icon={<Coins size={14} />}
           label="Treasury"
@@ -165,28 +165,32 @@ export default function Home() {
         />
       </div>
 
-      {/* Top gainers */}
-      <SectionHeader
-        title="Top Gainers"
-        action="See market"
-        onAction={() => nav("/rootmc/market?sort=gainers")}
-      />
-      <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
-        {gainers.map((it) => (
-          <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
-        ))}
-      </div>
-
-      {/* Top losers */}
-      <SectionHeader
-        title="Top Losers"
-        action="See market"
-        onAction={() => nav("/market?sort=losers")}
-      />
-      <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
-        {losers.map((it) => (
-          <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
-        ))}
+      {/* Movers */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <SectionHeader
+            title="Top Gainers"
+            action="See market"
+            onAction={() => nav("/rootmc/market?sort=gainers")}
+          />
+          <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
+            {gainers.map((it) => (
+              <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <SectionHeader
+            title="Top Losers"
+            action="See market"
+            onAction={() => nav("/rootmc/market?sort=losers")}
+          />
+          <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
+            {losers.map((it) => (
+              <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Daily report */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ export default function Rewards() {
         <h2 className="font-display font-bold text-xl">Sign in to claim rewards</h2>
         <p className="text-sm text-text-secondary">Daily check-in and vote rewards debit the treasury directly to your wallet.</p>
         <button
-          onClick={() => nav("/auth")}
+          onClick={() => nav("/rootmc/auth")}
           className="mx-auto rounded-md bg-gold text-black font-bold px-6 py-3"
           data-testid="rewards-signin-btn"
         >
@@ -94,6 +94,7 @@ function CheckInTab({ refreshUser }) {
   const [celebrate, setCelebrate] = useState(false);
   const [tick, setTick] = useState(0);
   const loadedAtRef = React.useRef(Date.now());
+  void tick; // forces countdown re-render each second
 
   useEffect(() => {
     api.get("/checkin/status").then(({ data }) => {
@@ -235,6 +236,7 @@ function VoteTab({ refreshUser }) {
   const [claiming, setClaiming] = useState(null);
   const [tick, setTick] = useState(0);
   const loadedAtRef = React.useRef(Date.now());
+  void tick; // forces cooldown re-render each second
   const [pending, setPending] = useState({}); // siteId -> boolean (visited, can claim)
 
   const load = () =>

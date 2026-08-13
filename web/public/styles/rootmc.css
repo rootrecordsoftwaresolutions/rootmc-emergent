@@ -1,43 +1,48 @@
 /* =========================================================
-   RootMC design system — "Minecraft economy terminal"
-   Dark · gold-forward · Material You–inspired
+   RootMC design system — Ava cyber-ops
+   Navy void · electric cyan · white ink · red LIVE · gold hair accent
    ========================================================= */
 
 :root {
-  /* Surfaces */
-  --rmc-bg:        #0a0f10;
-  --rmc-bg-deep:   #050809;
-  --rmc-surface:   #121a1c;
-  --rmc-surface-2: #1a2528;
-  --rmc-surface-3: #243034;
-  --rmc-outline:        rgba(245, 185, 66, 0.16);
-  --rmc-outline-soft:   rgba(245, 185, 66, 0.08);
+  /* Surfaces — Ava cyber-ops (Daily Broadcast) */
+  --rmc-bg:        #000d1a;
+  --rmc-bg-deep:   #00060e;
+  --rmc-surface:   #0c1c30;
+  --rmc-surface-2: #122438;
+  --rmc-surface-3: #1a3048;
+  --rmc-outline:        rgba(0, 229, 255, 0.18);
+  --rmc-outline-soft:   rgba(0, 229, 255, 0.08);
   --rmc-divider:        rgba(255, 255, 255, 0.07);
   --rmc-divider-strong: rgba(255, 255, 255, 0.12);
 
-  /* Brand currency / accent */
-  --rmc-gold:        #f5b942;
-  --rmc-gold-bright: #ffd16a;
-  --rmc-gold-dim:    #b88a2f;
-  --rmc-gold-glow:   rgba(245, 185, 66, 0.32);
-  --rmc-copper:      #c97b4f;
+  /* Brand — electric cyan primary. --rmc-gold is a legacy alias for cyan.
+     Real gold hair accent is --rmc-copper / --rmc-gold-hair (#ffd54a). Red LIVE. */
+  --rmc-gold:        #00e5ff;
+  --rmc-gold-bright: #5ef0ff;
+  --rmc-gold-dim:    #00a8c4;
+  --rmc-gold-glow:   rgba(0, 229, 255, 0.35);
+  --rmc-copper:      #ffd54a;
+  --rmc-gold-hair:   #ffd54a;
+  --rmc-cyan:        #00e5ff;
+  --rmc-cyan-bright: #5ef0ff;
+  --rmc-live-red:    #ff2a3a;
 
-  /* Economy semantic (chest-shop signs) */
-  --rmc-emerald:    #5dd39e;  /* up / positive / in stock */
-  --rmc-emerald-dim: rgba(93, 211, 158, 0.16);
-  --rmc-red:        #ef5b5b;  /* down / out of stock */
-  --rmc-red-dim:    rgba(239, 91, 91, 0.14);
-  --rmc-sell:       #7fb069;  /* sell shop (oak) */
-  --rmc-sell-dim:   rgba(127, 176, 105, 0.18);
-  --rmc-buy:        #e0625a;  /* buy shop (crimson) */
-  --rmc-buy-dim:    rgba(224, 98, 90, 0.16);
+  /* Economy semantic */
+  --rmc-emerald:    #00e5ff;
+  --rmc-emerald-dim: rgba(0, 229, 255, 0.16);
+  --rmc-red:        #ff2a3a;
+  --rmc-red-dim:    rgba(255, 42, 58, 0.14);
+  --rmc-sell:       #5ef0ff;
+  --rmc-sell-dim:   rgba(94, 240, 255, 0.18);
+  --rmc-buy:        #ff2a3a;
+  --rmc-buy-dim:    rgba(255, 42, 58, 0.16);
 
   /* Ink */
-  --rmc-ink:        #ecf1ed;
-  --rmc-ink-dim:    #c2cec7;
-  --rmc-ink-muted:  #a1afa8;
-  --rmc-ink-faint:  #6c7a74;
-  --rmc-ink-on-gold: #1a1308;
+  --rmc-ink:        #ffffff;
+  --rmc-ink-dim:    #c8d8e8;
+  --rmc-ink-muted:  #7a92a8;
+  --rmc-ink-faint:  #5a7088;
+  --rmc-ink-on-gold: #001018;
 
   /* Type */
   --rmc-font-display: "Bricolage Grotesque", "Fraunces", Georgia, serif;
@@ -52,12 +57,12 @@
   --rmc-r-lg: 22px;
   --rmc-r-xl: 28px;
 
-  /* Elevation (Material You–style layered shadows) */
+  /* Elevation */
   --rmc-elev-1: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35);
   --rmc-elev-2: 0 1px 0 rgba(255,255,255,0.05) inset, 0 6px 18px rgba(0,0,0,0.45);
   --rmc-elev-3: 0 1px 0 rgba(255,255,255,0.06) inset, 0 14px 36px rgba(0,0,0,0.55);
-  --rmc-glow-gold:    0 0 0 1px rgba(245, 185, 66, 0.28), 0 0 28px rgba(245, 185, 66, 0.20);
-  --rmc-glow-emerald: 0 0 0 1px rgba(93, 211, 158, 0.32), 0 0 22px rgba(93, 211, 158, 0.18);
+  --rmc-glow-gold:    0 0 0 1px rgba(0, 229, 255, 0.28), 0 0 28px rgba(0, 229, 255, 0.22);
+  --rmc-glow-emerald: 0 0 0 1px rgba(0, 229, 255, 0.32), 0 0 22px rgba(0, 229, 255, 0.18);
 
   /* Motion */
   --rmc-ease:    cubic-bezier(.2, .8, .2, 1);
@@ -237,14 +242,42 @@ img { max-width: 100%; height: auto; }
   top: var(--rmc-tape-h);
 }
 
+.eco-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  padding: 0.4rem 1rem;
+  background: #000d1a;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.16);
+  font-family: var(--rmc-font);
+  z-index: 80;
+}
+.eco-bar a {
+  color: var(--rmc-ink-muted);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.9rem;
+  border-radius: 999px;
+}
+.eco-bar a:hover { color: var(--rmc-ink); background: rgba(0, 229, 255, 0.08); }
+.eco-bar a[aria-current="page"] {
+  color: var(--rmc-cyan);
+  background: rgba(0, 229, 255, 0.12);
+}
+
 .rmc-header {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: linear-gradient(180deg, rgba(10,15,16,0.85) 0%, rgba(10,15,16,0.65) 100%);
+  background: linear-gradient(180deg, rgba(0,13,26,0.92) 0%, rgba(0,13,26,0.72) 100%);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border-bottom: 1px solid var(--rmc-divider);
+  border-bottom: 1px solid var(--rmc-outline);
 }
 
 .rmc-header-inner {
@@ -274,7 +307,7 @@ img { max-width: 100%; height: auto; }
   display: inline-flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; border-radius: 10px;
   background: linear-gradient(135deg, var(--rmc-gold) 0%, var(--rmc-copper) 100%);
-  color: #1a1308;
+  color: #000d1a;
   font-family: var(--rmc-font-display); font-weight: 700; font-size: 1.05rem;
   box-shadow: var(--rmc-glow-gold);
 }
@@ -527,7 +560,7 @@ img { max-width: 100%; height: auto; }
 .rmc-btn-primary {
   background: linear-gradient(180deg, var(--rmc-gold) 0%, var(--rmc-gold-dim) 100%);
   color: var(--rmc-ink-on-gold);
-  box-shadow: var(--rmc-elev-2), 0 0 0 1px rgba(245, 185, 66, 0.4) inset;
+  box-shadow: var(--rmc-elev-2), 0 0 0 1px rgba(0, 229, 255, 0.35) inset;
 }
 .rmc-btn-primary:hover {
   background: linear-gradient(180deg, var(--rmc-gold-bright) 0%, var(--rmc-gold) 100%);
@@ -553,6 +586,24 @@ img { max-width: 100%; height: auto; }
   color: var(--rmc-ink);
 }
 .rmc-btn-ghost:hover { color: var(--rmc-gold); border-color: var(--rmc-outline); }
+
+/* Wiki/pro content links force cyan — keep button text readable on filled CTAs. */
+.wiki-content a.rmc-btn,
+.wiki-content a.rmc-btn:hover {
+  text-decoration: none;
+}
+.wiki-content a.rmc-btn-primary,
+.wiki-content a.rmc-btn-primary:hover {
+  color: var(--rmc-ink-on-gold);
+}
+.wiki-content a.rmc-btn-secondary,
+.wiki-content a.rmc-btn-ghost {
+  color: var(--rmc-ink);
+}
+.wiki-content a.rmc-btn-secondary:hover,
+.wiki-content a.rmc-btn-ghost:hover {
+  color: var(--rmc-gold);
+}
 
 .rmc-btn:disabled {
   opacity: 0.4;
@@ -1113,6 +1164,12 @@ code, .wiki-pre, pre.wiki-pre {
   flex-direction: column;
   align-items: center;
   gap: 0.55rem;
+}
+.rmc-vote-tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
 }
 .rmc-vote-tool-note {
   margin: 0;
@@ -1912,6 +1969,46 @@ body.market-chart-modal-open { overflow: hidden; }
   font-size: 0.92rem;
   box-shadow: var(--rmc-elev-1);
 }
+.wiki-sidebar-fold { min-width: 0; }
+.wiki-sidebar-fold > summary {
+  display: none;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--rmc-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rmc-gold);
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--rmc-divider);
+  border-radius: var(--rmc-r-md);
+  background: var(--rmc-surface);
+  box-shadow: var(--rmc-elev-1);
+}
+.wiki-sidebar-fold > summary::-webkit-details-marker { display: none; }
+.wiki-sidebar-fold > summary::after {
+  content: "▾";
+  float: right;
+  color: var(--rmc-ink-faint);
+}
+.wiki-sidebar-fold[open] > summary::after { content: "▴"; }
+@media (max-width: 959px) {
+  .wiki-sidebar {
+    position: static;
+    top: auto;
+  }
+  .wiki-sidebar-fold > summary { display: block; }
+  .wiki-sidebar-fold[open] > summary {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .wiki-sidebar-fold[open] .wiki-sidebar {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
 .wiki-sidebar h2 {
   margin: 0 0 0.7rem;
   font-family: var(--rmc-mono);
@@ -2179,7 +2276,7 @@ body.market-chart-modal-open { overflow: hidden; }
 }
 
 .verify-status-info {
-  background: rgba(93, 211, 158, 0.08);
+  background: rgba(0, 229, 255, 0.08);
   color: var(--rmc-emerald);
   border: 1px solid rgba(93, 211, 158, 0.28);
 }
@@ -2759,7 +2856,7 @@ body.market-chart-modal-open { overflow: hidden; }
   margin: 0.75rem 0 0;
   font-size: 0.82rem;
 }
-.reserve-in { color: #5dd39e !important; }
+.reserve-in { color: #00e5ff !important; }
 .reserve-out { color: #ef5b5b !important; }
 .reserve-convert { color: #a8b8b0; font-size: 0.92rem; }
 .reserve-neg { color: #ef8f8f !important; }
@@ -2990,7 +3087,7 @@ select:focus-visible {
   font-family: var(--rmc-font-mono, "JetBrains Mono", monospace);
   font-weight: 700;
   font-size: 1rem;
-  color: #0a0f10;
+  color: #000d1a;
   background: var(--rmc-gold);
 }
 .economy-scope-mark--claims {
@@ -3053,7 +3150,7 @@ select:focus-visible {
 .list-lines { margin: 0; padding: 0; list-style: none; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.85rem; line-height: 1.55; }
 .list-lines li { display: flex; gap: 0.5rem; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.2rem 0; }
 .list-lines .lbl { color: #a1afa8; }
-.list-lines .val { color: #f5b942; white-space: nowrap; }
+.list-lines .val { color: #00e5ff; white-space: nowrap; }
 
 .generation-switch {
   display: inline-flex;
@@ -3086,15 +3183,15 @@ select:focus-visible {
   background: rgba(255, 255, 255, 0.05);
 }
 .generation-switch-btn.is-active {
-  color: #0a0f10;
-  background: linear-gradient(135deg, var(--rmc-gold-bright, #f5b942), var(--rmc-copper, #c47a3a));
+  color: #000d1a;
+  background: linear-gradient(135deg, var(--rmc-gold-bright, #00e5ff), var(--rmc-copper, #ffd54a));
 }
 .economy-audit-panel { margin-bottom: 1.25rem; }
 .economy-audit-lead { margin: 0.35rem 0 0.75rem; max-width: 46rem; }
 .economy-audit-summary {
   margin: 0 0 1rem;
   padding: 0.65rem 0.85rem;
-  border-left: 3px solid #5dd39e;
+  border-left: 3px solid #00e5ff;
   background: rgba(93, 211, 158, 0.06);
   font-size: 0.92rem;
   line-height: 1.5;
@@ -3162,7 +3259,7 @@ select:focus-visible {
   line-height: 1.5;
 }
 .economy-alert--ok {
-  border-left-color: #5dd39e;
+  border-left-color: #00e5ff;
   background: rgba(93, 211, 158, 0.06);
 }
 .economy-grid {
@@ -3556,7 +3653,7 @@ select:focus-visible {
   vertical-align: middle;
   margin-left: 0.35rem;
 }
-.health-badge--on { color: #5dd39e; border: 1px solid rgba(93, 211, 158, 0.35); background: rgba(93, 211, 158, 0.08); }
+.health-badge--on { color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.35); background: rgba(0, 229, 255, 0.08); }
 .health-badge--off { color: var(--rmc-muted); border: 1px solid var(--rmc-border); background: rgba(255, 255, 255, 0.03); }
 .health-timeline { margin-top: 1.25rem; }
 .health-timeline-grid { display: flex; flex-direction: column; gap: 0.85rem; }
@@ -3858,120 +3955,13 @@ select:focus-visible {
 }
 
 
-/* =====================  2026-08-06 primary + Ava chat + votes  ===================== */
+/* =====================  2026-08-06 primary + votes (public Ava chat removed)  ===================== */
 .rmc-sr-only {
   position: absolute;
   width: 1px; height: 1px;
   padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0);
   white-space: nowrap; border: 0;
-}
-@media (min-width: 1100px) {
-  .rmc-hero-grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 24rem) minmax(16rem, 21rem);
-    align-items: stretch;
-  }
-}
-.rmc-ava-chat {
-  display: flex;
-  flex-direction: column;
-  min-height: 18rem;
-  max-height: 26rem;
-  padding: 0.85rem 0.95rem 0.95rem;
-  border-radius: var(--rmc-r-xl);
-  border: 1px solid rgba(245, 185, 66, 0.28);
-  background:
-    radial-gradient(120% 100% at 100% 0%, rgba(245, 185, 66, 0.10), transparent 55%),
-    linear-gradient(165deg, var(--rmc-surface-2) 0%, var(--rmc-surface) 100%);
-  box-shadow: var(--rmc-elev-3);
-}
-.rmc-ava-chat-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.65rem;
-}
-.rmc-ava-chat-head strong {
-  font-family: var(--rmc-font-display);
-  font-size: 1.05rem;
-  font-weight: 650;
-  color: var(--rmc-ink);
-}
-.rmc-ava-chat-status {
-  font-family: var(--rmc-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--rmc-gold);
-}
-.rmc-ava-chat-log {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.15rem 0.1rem 0.55rem;
-  min-height: 10rem;
-}
-.rmc-ava-bubble {
-  max-width: 95%;
-  padding: 0.65rem 0.8rem;
-  border-radius: 0.85rem;
-  font-size: 0.88rem;
-  line-height: 1.45;
-  white-space: pre-wrap;
-}
-.rmc-ava-bubble.ava {
-  align-self: flex-start;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--rmc-divider);
-  color: var(--rmc-ink);
-}
-.rmc-ava-bubble.ava.rmc-ava-summary {
-  border-color: rgba(245, 185, 66, 0.35);
-  background: rgba(245, 185, 66, 0.07);
-}
-.rmc-ava-bubble.you {
-  align-self: flex-end;
-  background: rgba(93, 211, 158, 0.12);
-  border: 1px solid rgba(93, 211, 158, 0.28);
-  color: var(--rmc-ink);
-}
-.rmc-ava-bubble.rmc-ava-loading { color: var(--rmc-ink-muted); font-style: italic; }
-.rmc-ava-chat-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.45rem;
-  margin-top: 0.35rem;
-}
-.rmc-ava-chat-form input {
-  min-width: 0;
-  padding: 0.65rem 0.8rem;
-  border-radius: var(--rmc-r);
-  border: 1px solid var(--rmc-divider);
-  background: rgba(0,0,0,0.25);
-  color: var(--rmc-ink);
-  font: inherit;
-  font-size: 0.9rem;
-}
-.rmc-ava-chat-form input:focus {
-  outline: none;
-  border-color: rgba(245, 185, 66, 0.55);
-}
-.rmc-ava-chat-form button {
-  padding: 0.65rem 0.95rem;
-  border-radius: var(--rmc-r);
-  border: 1px solid rgba(245, 185, 66, 0.45);
-  background: linear-gradient(135deg, rgba(245,185,66,0.95), rgba(196,120,48,0.95));
-  color: #14110c;
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-}
-.rmc-ava-chat-form button:disabled { opacity: 0.5; cursor: wait; }
-@media (max-width: 1099px) {
-  .rmc-ava-chat { max-width: 36rem; max-height: none; min-height: 16rem; }
 }
 
 .rmc-vote-grid {

@@ -26,12 +26,13 @@ export async function handleAvaCronKickRoutes(
   if (!validateDevWorkstationAuth(request, env)) {
     return json({ ok: false, detail: "forbidden" }, 403);
   }
-  let body: { force?: boolean; reason?: string } = {};
+  let body: { force?: boolean; dailyOnly?: boolean; reason?: string } = {};
   try { body = (await request.json()) as typeof body; } catch { /* empty */ }
   const result = await runRootMcCronBundle(env, ctx, {
     job,
     when: new Date(),
     force: Boolean(body.force),
+    dailyOnly: Boolean(body.dailyOnly),
     reason: String(body.reason || "ava-cron-kick"),
   });
   return json({ ok: true, job, ...result }, 200);

@@ -24,11 +24,11 @@ export default function TopBar() {
   const online = status?.online;
   return (
     <header
-      className="sticky top-0 z-40 max-w-md mx-auto bg-bg-base/80 backdrop-blur-xl border-b border-white/5"
+      className="sticky top-0 z-40 bg-bg-base/80 backdrop-blur-xl border-b border-white/5"
       data-testid="top-bar"
     >
-      <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")} data-testid="topbar-root-link">
+      <div className="px-4 md:px-6 py-3 flex items-center justify-between max-w-6xl mx-auto md:max-w-none">
+        <div className="flex items-center gap-2 cursor-pointer md:hidden" onClick={() => navigate("/")} data-testid="topbar-root-link">
           <div className="h-8 w-8 rounded-md bg-gold/10 border border-gold/30 grid place-items-center">
             <span className="font-display font-extrabold text-gold text-sm tracking-tight">R</span>
           </div>
@@ -40,6 +40,9 @@ export default function TopBar() {
               Terminal
             </div>
           </div>
+        </div>
+        <div className="hidden md:block text-[11px] font-mono uppercase tracking-[0.2em] text-text-secondary">
+          Trading terminal
         </div>
 
         <div className="flex items-center gap-2">

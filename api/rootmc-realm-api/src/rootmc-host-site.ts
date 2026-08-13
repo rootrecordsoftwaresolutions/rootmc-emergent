@@ -21,27 +21,160 @@ function str(v: unknown): string {
   return String(v ?? "").trim();
 }
 
+/** Gaming bonus track: 10% bank = zero bonus (1.0×), 100% = 2.0×. */
+export const GAMING_TRACK_FLOOR = 10;
+export const GAMING_TRACK_CEIL = 100;
+export const GAMING_UNDERPOWERED_TAX = 0.1;
+export const GAMING_UNDERPOWERED_MULT = 0.9;
+export const CPU_BONUS_MAX = 75;
+export const CPU_TAX_HIGH = 90;
+export const CPU_TAX_MILD = 0.01;
+export const CPU_TAX_HEAVY = 0.03;
+
+function round3(n: number): number {
+  return Math.round(n * 1000) / 1000;
+}
+
+export function cpuTaxRate(cpuPercent: number | null | undefined): number {
+  if (cpuPercent == null || !Number.isFinite(Number(cpuPercent))) return 0;
+  const cpu = Math.min(100, Math.max(0, Number(cpuPercent)));
+  if (cpu >= CPU_TAX_HIGH) return CPU_TAX_HEAVY;
+  if (cpu >= CPU_BONUS_MAX) return CPU_TAX_MILD;
+  return 0;
+}
+
+/** +0.01× skills XP per 100 W solar input. */
+export function solarXpMultiplier(solarW: number | null | undefined): number {
+  if (solarW == null || !Number.isFinite(Number(solarW)) || Number(solarW) <= 0) return 1;
+  return round3(1 + Math.floor(Number(solarW) / 100) * 0.01);
+}
+
 /**
- * Solar bank SOC → gold mining multiplier during online hours.
- * multiplier = 1 + (batteryPercent / 100), clamp battery 0–100, max 3 decimals.
- * Offline / stale / no on-circuit bank / host device off → 1.0× (normal Gold).
+ * Solar bank SOC + CPU load → gaming bonus / tax.
+ * Track 10–100%: 10% → 1.0×, 100% → 2.0×.
+ * CPU ≥75% avg → gold bonus paused + 1% tax; ≥90% → 3% tax.
+ * Offline / underpowered → 10% tax (0.90× mining), stacked with CPU tax.
  */
 export function computeSolarMiningMultiplier(
   batteryPercent: number | null | undefined,
   online: boolean,
 ): number {
-  if (!online || batteryPercent == null || !Number.isFinite(Number(batteryPercent))) {
-    return 1;
+  return resolveGamingBonus(batteryPercent, online).multiplier;
+}
+
+export function resolveGamingBonus(
+  batteryPercent: number | null | undefined,
+  hostOnline: boolean,
+  extras: { cpuPct?: number | null; solarW?: number | null } = {},
+): {
+  battery_percent: number | null;
+  track_percent: number | null;
+  multiplier: number;
+  tax_rate: number;
+  underpowered_tax_rate: number;
+  cpu_tax_rate: number;
+  cpu_percent: number | null;
+  solar_w: number | null;
+  xp_multiplier: number;
+  bonus: number;
+  online: boolean;
+  underpowered: boolean;
+  cpu_hot: boolean;
+  mode: "bonus" | "tax";
+  detail: string;
+} {
+  const bank =
+    batteryPercent != null && Number.isFinite(Number(batteryPercent))
+      ? Math.min(100, Math.max(0, Number(batteryPercent)))
+      : null;
+  const cpu =
+    extras.cpuPct != null && Number.isFinite(Number(extras.cpuPct))
+      ? Math.min(100, Math.max(0, Number(extras.cpuPct)))
+      : null;
+  const solarW =
+    extras.solarW != null && Number.isFinite(Number(extras.solarW))
+      ? Math.max(0, Number(extras.solarW))
+      : null;
+  const cpuTax = cpuTaxRate(cpu);
+  const cpuHot = cpu != null && cpu >= CPU_BONUS_MAX;
+  const xpMult = solarXpMultiplier(solarW);
+  const powered = Boolean(hostOnline) && bank != null && bank >= GAMING_TRACK_FLOOR;
+
+  if (!powered) {
+    return {
+      battery_percent: bank,
+      track_percent: bank,
+      multiplier: GAMING_UNDERPOWERED_MULT,
+      tax_rate: round3(GAMING_UNDERPOWERED_TAX + cpuTax),
+      underpowered_tax_rate: GAMING_UNDERPOWERED_TAX,
+      cpu_tax_rate: cpuTax,
+      cpu_percent: cpu,
+      solar_w: solarW,
+      xp_multiplier: xpMult,
+      bonus: 0,
+      online: false,
+      underpowered: Boolean(hostOnline),
+      cpu_hot: cpuHot,
+      mode: "tax",
+      detail: !hostOnline ? "host_offline" : bank == null ? "no_bank" : "underpowered",
+    };
   }
-  const pct = Math.min(100, Math.max(0, Number(batteryPercent)));
-  return Math.round((1 + pct / 100) * 1000) / 1000;
+  if (cpuHot) {
+    return {
+      battery_percent: bank,
+      track_percent: Math.min(GAMING_TRACK_CEIL, Math.max(GAMING_TRACK_FLOOR, bank)),
+      multiplier: 1,
+      tax_rate: cpuTax,
+      underpowered_tax_rate: 0,
+      cpu_tax_rate: cpuTax,
+      cpu_percent: cpu,
+      solar_w: solarW,
+      xp_multiplier: xpMult,
+      bonus: 0,
+      online: false,
+      underpowered: false,
+      cpu_hot: true,
+      mode: "tax",
+      detail: cpuTax >= CPU_TAX_HEAVY ? "cpu_90" : "cpu_75",
+    };
+  }
+  const track = Math.min(GAMING_TRACK_CEIL, Math.max(GAMING_TRACK_FLOOR, bank));
+  const multiplier = round3(1 + (track - GAMING_TRACK_FLOOR) / (GAMING_TRACK_CEIL - GAMING_TRACK_FLOOR));
+  return {
+    battery_percent: bank,
+    track_percent: track,
+    multiplier,
+    tax_rate: 0,
+    underpowered_tax_rate: 0,
+    cpu_tax_rate: 0,
+    cpu_percent: cpu,
+    solar_w: solarW,
+    xp_multiplier: xpMult,
+    bonus: round3(multiplier - 1),
+    online: true,
+    underpowered: false,
+    cpu_hot: false,
+    mode: "bonus",
+    detail: "live",
+  };
 }
 
 export type SolarMiningMultiplierSnapshot = {
   ok: true;
   battery_percent: number | null;
+  track_percent?: number | null;
   multiplier: number;
+  tax_rate: number;
+  underpowered_tax_rate?: number;
+  cpu_tax_rate?: number;
+  cpu_percent?: number | null;
+  solar_w?: number | null;
+  xp_multiplier?: number;
+  bonus?: number;
   online: boolean;
+  underpowered?: boolean;
+  cpu_hot?: boolean;
+  mode?: "bonus" | "tax";
   source: string;
   updated_at: string | null;
   detail?: string;
@@ -50,7 +183,8 @@ export type SolarMiningMultiplierSnapshot = {
 /**
  * Online hours = fresh host-site telemetry + live EcoFlow aggregate bank SOC
  * (on-circuit average already on the solar dashboard — not a sum of packs).
- * Host / device off, EcoFlow offline, off-circuit-only / stale / missing → 1.0× normal Gold.
+ * Host / device off, EcoFlow offline, off-circuit-only / stale / missing / bank &lt; 10%
+ * → 10% tax (0.90× mining). Bank 10–100% → linear 1.0×–2.0× bonus.
  */
 export function resolveSolarMiningMultiplier(
   telem: Record<string, unknown> | null,
@@ -124,15 +258,37 @@ export function resolveSolarMiningMultiplier(
     detail = "no_on_circuit_bank";
   }
 
-  const multiplier = computeSolarMiningMultiplier(battery, online);
+  const cpuRaw =
+    solar.cpuHourAvgPct ??
+    solar.cpuPct ??
+    (telem as Record<string, unknown> | null)?.cpuHourAvgPct ??
+    (telem as Record<string, unknown> | null)?.cpuPct;
+  const cpu =
+    cpuRaw != null && Number.isFinite(Number(cpuRaw)) ? Number(cpuRaw) : null;
+  const solarWRaw = solar.solarW ?? (telem as Record<string, unknown> | null)?.solarW;
+  const solarW =
+    solarWRaw != null && Number.isFinite(Number(solarWRaw)) ? Number(solarWRaw) : null;
+
+  const gaming = resolveGamingBonus(battery, online, { cpuPct: cpu, solarW });
   return {
     ok: true,
     battery_percent: hasBank ? battery : null,
-    multiplier,
-    online,
-    source: "host-site-telemetry.solar.batteryPct",
+    track_percent: gaming.track_percent,
+    multiplier: gaming.multiplier,
+    tax_rate: gaming.tax_rate,
+    underpowered_tax_rate: gaming.underpowered_tax_rate,
+    cpu_tax_rate: gaming.cpu_tax_rate,
+    cpu_percent: gaming.cpu_percent,
+    solar_w: gaming.solar_w,
+    xp_multiplier: gaming.xp_multiplier,
+    bonus: gaming.bonus,
+    online: gaming.online,
+    underpowered: gaming.underpowered,
+    cpu_hot: gaming.cpu_hot,
+    mode: gaming.mode,
+    source: "host-site-telemetry.solar",
     updated_at: updatedAt,
-    detail,
+    detail: gaming.online ? detail : gaming.detail || detail,
   };
 }
 

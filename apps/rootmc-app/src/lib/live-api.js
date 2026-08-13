@@ -304,34 +304,25 @@ async function mapLeaderboards(category) {
 }
 
 async function mapDailyReport() {
-  try {
-    const { data } = await rootmc.dailyReport();
-    const latest = (data.reports || [])[0];
-    if (!latest) {
-      return {
-        date: new Date().toISOString(),
-        title: "Daily report pending",
-        summary: "The intelligence suite has not posted today's report yet.",
-        highlights: [],
-      };
-    }
-    return {
-      date: latest.posted_at || latest.day_key,
-      title: latest.summary?.slice(0, 80) || `Report ${latest.day_key}`,
-      summary: latest.summary || latest.report_text || "",
-      highlights: (latest.categories || []).slice(0, 4).map((c) => ({
-        label: c.title || c.category,
-        value: (c.summary || "").slice(0, 40),
-      })),
-    };
-  } catch {
+  const { data } = await rootmc.dailyReport();
+  const latest = (data.reports || [])[0];
+  if (!latest) {
     return {
       date: new Date().toISOString(),
-      title: "Daily report unavailable",
-      summary: "",
+      title: "Daily report pending",
+      summary: "The intelligence suite has not posted today's report yet.",
       highlights: [],
     };
   }
+  return {
+    date: latest.posted_at || latest.day_key,
+    title: latest.summary?.slice(0, 80) || `Report ${latest.day_key}`,
+    summary: latest.summary || latest.report_text || "",
+    highlights: (latest.categories || []).slice(0, 4).map((c) => ({
+      label: c.title || c.category,
+      value: (c.summary || "").slice(0, 40),
+    })),
+  };
 }
 
 function axiosErr(e) {

@@ -23,7 +23,6 @@ import {
   discordActivityForPlayers,
   economyContextForPlayers,
   economyIntelBriefContext,
-  hostComparisonForPlayers,
   netWorthLeaderboardForPlayers,
   sanitizePlayerFacingReport,
   walletLeaderboardForPlayers,
@@ -129,21 +128,17 @@ function buildWeeklyCombinedContext(metrics: DailyMetrics): Record<string, unkno
     report_kind: "server_weekly_combined",
     period: { week_key: metrics.dayKey, timezone: "Pacific/Honolulu", days: 7 },
     realm_note:
-      "Two equal public hosts. Playtime and votes are realm-merged — show once, never per-host. REQUIRED: lead with host_comparison (Towny | Claims). Never sum wallets across hosts. Never treat wallet totals as combined net worth.",
+      "Live production is play.rootmc.net (Root-Ava-Core). Do not mention towns, nations, or claims. Never treat wallet totals as combined net worth.",
     server: { name: metrics.serverName, game_version: metrics.gameVersion },
-    host_comparison: hostComparisonForPlayers(
-      {
-        name: metrics.serverName,
-        economy: metrics.economy,
-      },
-      {
-        name: metrics.claims.displayName,
-        onlinePlayers: metrics.claims.onlinePlayers,
-        economy: metrics.claims.economy,
-      },
-    ),
+    live_production: {
+      name: metrics.serverName,
+      join: "play.rootmc.net",
+      economy: economyContextForPlayers(metrics.economy),
+      top_net_worth: netWorthLeaderboardForPlayers(metrics.netWorth, 5),
+      top_wallet_balances: walletLeaderboardForPlayers(metrics.wallets, 5),
+    },
     linked_players: metrics.linked,
-    linked_players_note: "Realm-wide Discord-linked Minecraft accounts — shared by Towny and Claims (not per host).",
+    linked_players_note: "Discord-linked Minecraft accounts for live production.",
     realm_playtime: {
       players_with_playtime: metrics.playersWithPlaytime,
       top_playtime: metrics.playtime.slice(0, 5).map((p, i) => ({
@@ -151,35 +146,7 @@ function buildWeeklyCombinedContext(metrics: DailyMetrics): Record<string, unkno
         player: str(p.minecraft_username) || "Unknown",
         playtime: formatPlaytime(Number(p.total_playtime_seconds) || 0),
       })),
-      note: "Shared Towny+Claims playtime pool — do not duplicate under each host.",
-    },
-    hosts: {
-      towny: {
-        name: metrics.serverName,
-        economy: economyContextForPlayers(metrics.economy),
-        top_net_worth: netWorthLeaderboardForPlayers(metrics.netWorth, 5),
-        top_wallet_balances: walletLeaderboardForPlayers(metrics.wallets, 5),
-        active_towns: metrics.towny.townCount,
-        active_nations: metrics.towny.nationCount,
-      },
-      claims: {
-        name: metrics.claims.displayName,
-        join_address: metrics.claims.joinAddress,
-        players_online: metrics.claims.onlinePlayers,
-        economy: economyContextForPlayers(metrics.claims.economy),
-        top_wallet_balances: walletLeaderboardForPlayers(metrics.claims.wallets, 5),
-        top_net_worth: netWorthLeaderboardForPlayers(
-          (metrics.claims.netWorth.length
-            ? metrics.claims.netWorth
-            : metrics.claims.wallets
-          ).map((row) => ({
-            ...row,
-            total_value:
-              Number(row.total_value) > 0 ? Number(row.total_value) : Number(row.balance_value) || 0,
-          })),
-          5,
-        ),
-      },
+      note: "Live production playtime pool (Root-Ava-Core).",
     },
     discord: discordActivityForPlayers(metrics.discord),
     generated_at: new Date().toISOString(),

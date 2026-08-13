@@ -28,7 +28,7 @@ import { resolveCategoryChannelId } from "./rootmc-report-channels";
 import {
   composeDualHostEconomyReportText,
   economyIntelBriefContext,
-  formatEqualDualHostEconomyBody,
+  formatLiveProductionEconomyBody,
   formatTreasuryBriefAppendix,
   sanitizePlayerFacingReport,
 } from "./rootmc-player-facing";
@@ -138,7 +138,7 @@ function formatSyncedAtHst(iso: string | null | undefined): string {
 function buildCategoryAppendix(metrics: DailyMetrics, category: RootMcDailyCategory): string {
   switch (category) {
     case "economy_intel":
-      // Equal Towny/Claims body is already in report_text; appendix is reserve only.
+      // Live production body is already in report_text; appendix is reserve only.
       return formatTreasuryBriefAppendix(metrics.treasury, formatSyncedAtHst(metrics.economy.syncedAt));
     case "towns":
       return formatTownsBriefAppendix(metrics.towny);
@@ -234,22 +234,18 @@ export async function runRootMcDailyCategoryReport(
       reportText = `_Intelligence brief unavailable._`;
     }
     if (category === "economy_intel") {
-      const dualHostBody = formatEqualDualHostEconomyBody({
+      const liveBody = formatLiveProductionEconomyBody({
         linked: metrics.linked,
         playersWithPlaytime: metrics.playersWithPlaytime,
         playtime: metrics.playtime,
-        towny: {
+        live: {
           economy: metrics.economy,
           wallets: metrics.wallets,
-        },
-        claims: {
-          economy: metrics.claims.economy,
-          wallets: metrics.claims.wallets,
         },
       });
       reportText = composeDualHostEconomyReportText({
         aiReportText: reportText,
-        dualHostBody,
+        dualHostBody: liveBody,
       });
     }
     await archiveRootMcDailyAiToDiscord(env, {

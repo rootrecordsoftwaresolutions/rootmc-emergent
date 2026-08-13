@@ -18,14 +18,14 @@ const worlds = [
     cta: "Enter Root Record",
     accent: "#4ea87a",
     icon: LayoutGrid,
-    links: ["Weather Manager", "Kīlauea Alerts", "Business Manager", "Account Hub"],
+    links: ["Kīlauea Alerts", "Weather Manager", "Business Manager", "Account Hub"],
   },
   {
     key: "rootmc",
     kicker: "RootMC",
     title: "Your journey is written here",
     body: "One primary survival world — linked progression, closed-loop Gold, a live map and Discord bridge. Official survival that isn't pay-to-win.",
-    to: "/rootmc",
+    href: "https://rootmc.net/",
     cta: "Enter RootMC",
     accent: "#f0a83c",
     icon: Gamepad2,
@@ -85,11 +85,13 @@ export default function Portal() {
               style={{ background: "#4ea87a" }}>
               Enter Root Record <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link to="/rootmc" data-testid="portal-cta-rootmc"
+            <a
+              href="https://rootmc.net/"
+              data-testid="portal-cta-rootmc"
               className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-semibold transition-transform hover:-translate-y-0.5"
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#fff" }}>
               Enter RootMC <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -107,6 +109,31 @@ export default function Portal() {
               initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
+              {w.href ? (
+                <a
+                  href={w.href}
+                  data-testid={`portal-world-${w.key}`}
+                  className="group block rounded-3xl p-8 h-full transition-colors"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="h-11 w-11 rounded-xl grid place-items-center" style={{ background: `${w.accent}22`, color: w.accent }}>
+                      <w.icon size={22} />
+                    </span>
+                    <span className="text-[13px] uppercase tracking-[0.25em] font-semibold" style={{ color: w.accent }}>{w.kicker}</span>
+                  </div>
+                  <h3 className="mt-6 font-bold text-2xl sm:text-[1.75rem] tracking-tight text-white" style={bric}>{w.title}</h3>
+                  <p className="mt-3 text-[#a9bdb1] leading-relaxed">{w.body}</p>
+                  <ul className="mt-6 flex flex-wrap gap-2">
+                    {w.links.map((l) => (
+                      <li key={l} className="text-[12.5px] rounded-full px-3 py-1" style={{ background: "rgba(255,255,255,0.05)", color: "#c6d4cb" }}>{l}</li>
+                    ))}
+                  </ul>
+                  <span className="mt-7 inline-flex items-center gap-2 font-semibold transition-transform group-hover:translate-x-1" style={{ color: w.accent }}>
+                    {w.cta} <ArrowRight size={16} />
+                  </span>
+                </a>
+              ) : (
               <Link
                 to={w.to}
                 data-testid={`portal-world-${w.key}`}
@@ -130,6 +157,7 @@ export default function Portal() {
                   {w.cta} <ArrowRight size={16} />
                 </span>
               </Link>
+              )}
             </motion.div>
           ))}
         </div>

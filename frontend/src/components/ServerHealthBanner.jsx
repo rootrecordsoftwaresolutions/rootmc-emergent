@@ -34,7 +34,7 @@ export default function ServerHealthBanner() {
 
   return (
     <div
-      className={`sticky top-[57px] z-30 max-w-md mx-auto px-3 py-2 flex items-center gap-2 border-b ${
+      className={`sticky top-[57px] z-30 px-3 md:px-6 py-2 flex items-center gap-2 border-b ${
         apiDown
           ? "bg-neg/10 border-neg/30 text-neg"
           : "bg-warn/10 border-warn/30 text-warn"

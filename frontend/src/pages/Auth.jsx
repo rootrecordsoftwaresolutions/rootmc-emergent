@@ -61,7 +61,7 @@ export default function Auth() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="px-4 pt-6 pb-8 space-y-6"
+      className="px-4 md:px-6 pt-6 pb-8 space-y-6 max-w-lg mx-auto"
       data-testid="auth-screen"
     >
       <div className="text-center space-y-2">

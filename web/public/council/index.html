@@ -68,7 +68,7 @@
     <div class="council-grid" id="council-stats" hidden>
       <div class="council-stat"><strong id="stat-eligible">—</strong>Eligible voters</div>
       <div class="council-stat"><strong id="stat-polls">—</strong>Open polls</div>
-      <div class="council-stat"><strong id="stat-formula">EC shards × Pro</strong>Power formula</div>
+      <div class="council-stat"><strong id="stat-formula">EC shards × Pro/Life</strong>Power formula</div>
     </div>
 
     <section class="rmc-card" style="margin-top: 1.25rem;">
@@ -145,7 +145,7 @@
         <div class="req-block">
           <h3>Your vote weight</h3>
           <ul>
-            <li><strong>raw</strong> = Vote Shard power in <code>/ec</code> × Pro multiplier</li>
+            <li><strong>raw</strong> = Vote Shard power in <code>/ec</code> × vote multiplier (Pro ×2 / Lifetime ×3 / both ×5)</li>
             <li><strong>share</strong> = your raw ÷ all eligible raw → % of 100%</li>
             <li><strong>EC shards</strong> mint +1 per listing vote on that server; merge with <code>/voteshard merge</code></li>
             <li>Playtime and net worth do <strong>not</strong> affect Council weight</li>
@@ -186,9 +186,9 @@
     <section class="rmc-card" style="margin-top: 1.25rem;" id="power-section">
       <h2 style="margin-top:0">How voting power works</h2>
       <p class="rmc-muted" id="policy-share-note">Each eligible voter holds a share of 100% — all shares sum to exactly 100%.</p>
-      <div class="policy-formula" id="policy-formula">raw = ec_vote_shard_count × pro_multiplier
+      <div class="policy-formula" id="policy-formula">raw = ec_vote_shard_count × vote_multiplier
 share = raw ÷ Σ(all raw) → % of 100%</div>
-      <p class="council-note">Weight comes from <strong>Vote Shards in double <code>/ec</code></strong> (merge with <code>/voteshard merge</code>). Listing votes mint +1 shard weight on that server. <strong>Active Pro doubles EC shard weight (×2)</strong>. Playtime does not multiply. <strong>Ava Ivy</strong> holds a synthetic seat at <strong>10% of total share</strong> (from Alexrs94) and auto-votes <strong>for</strong> on open. Net worth does not affect Council weight.</p>
+      <p class="council-note">Weight comes from <strong>Vote Shards in double <code>/ec</code></strong> (merge with <code>/voteshard merge</code>). Listing votes mint +1 shard weight on that server. <strong>Pay to steer:</strong> Pro <strong>×2</strong>, Lifetime <strong>×3</strong>, Pro+Lifetime <strong>×5</strong>. Playtime does not multiply. <strong>Ava Ivy</strong> holds a locked seat at <strong>25% of total share</strong> (one-third the sum of every other voter) and auto-votes <strong>for</strong> on open. Net worth does not affect Council weight.</p>
       <p class="council-note" style="margin-top:.5rem;"><a id="policy-constitution" href="/wiki/constitution/#governance-voting">Full policy in the Constitution</a></p>
     </section>
   </main>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { fmtPct, deltaColor } from "../lib/format";
+import { fmtPct } from "../lib/format";
 import Sparkline from "../components/Sparkline";
 import SyncBadge from "../components/SyncBadge";
 import PullIndicator from "../components/PullIndicator";
@@ -68,7 +68,7 @@ export default function Market() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="px-4 pt-4 space-y-4 relative"
+      className="px-4 md:px-6 pt-4 md:pt-6 space-y-4 relative"
       data-testid="market-screen"
     >
       <PullIndicator {...ptr} />

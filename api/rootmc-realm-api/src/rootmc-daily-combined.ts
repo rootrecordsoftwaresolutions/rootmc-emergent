@@ -26,7 +26,7 @@ import {
   stripServerReserveSection,
 } from "./rootmc-discord-markdown";
 import { ROOTMC_DAILY_SERVER_AI_SYSTEM_PROMPT } from "./rootmc-grok-prompts";
-import { composeDualHostDailyReportText, formatDiscordDailySection, formatEqualDualHostDailyBody, hostComparisonForPlayers, sanitizePlayerFacingReport, discordActivityForPlayers, economyContextForPlayers } from "./rootmc-player-facing";
+import { composeDualHostDailyReportText, formatDiscordDailySection, formatEqualDualHostDailyBody, sanitizePlayerFacingReport, discordActivityForPlayers, economyContextForPlayers } from "./rootmc-player-facing";
 import { mirrorReportToSlackServerReports } from "./rootmc-slack-report-mirror";
 import { resolveDailySummaryChannelId } from "./rootmc-report-channels";
 import {
@@ -72,49 +72,27 @@ function buildCombinedMetricsOnly(metrics: Awaited<ReturnType<typeof gatherDaily
     report_kind: "server_daily_combined",
     period: { day_key: metrics.dayKey, timezone: "Pacific/Honolulu" },
     realm_note:
-      "Daily Summary (not Economy brief). Lead with Discord/community activity. Keep host economy to a light glance only — never deep-dive wallets, net worth, shops, or mined gold here.",
+      "Daily Summary (not Economy brief). Lead with Discord/community activity. Live production is play.rootmc.net (Root-Ava-Core). Do not mention towns, nations, or claims. Keep economy to a light glance only.",
     server: {
       name: metrics.serverName,
       game_version: metrics.gameVersion,
     },
-    host_comparison: hostComparisonForPlayers(
-      {
-        name: metrics.serverName,
-        economy: metrics.economy,
+    live_production: {
+      name: metrics.serverName,
+      join: "play.rootmc.net",
+      economy: {
+        gold_in_wallets: economyContextForPlayers(metrics.economy).gold_in_wallets_total,
+        players_with_balances: metrics.economy.trackedPlayers,
       },
-      {
-        name: metrics.claims.displayName,
-        onlinePlayers: metrics.claims.onlinePlayers,
-        economy: metrics.claims.economy,
-      },
-    ),
+    },
     linked_players: metrics.linked,
-    linked_players_note: "Realm-wide Discord-linked Minecraft accounts — shared by Towny and Claims (not per host).",
+    linked_players_note: "Discord-linked Minecraft accounts for live production.",
     realm_playtime: {
       players_with_playtime: metrics.playersWithPlaytime,
       top_playtime: playtimeForPlayers(metrics.playtime),
-      note: "Shared Towny+Claims playtime pool — do not duplicate under each host.",
+      note: "Live production playtime pool (Root-Ava-Core).",
     },
     discord: discordActivityForPlayers(metrics.discord),
-    hosts: {
-      towny: {
-        name: metrics.serverName,
-        economy: {
-          gold_in_wallets: economyContextForPlayers(metrics.economy).gold_in_wallets_total,
-          players_with_balances: metrics.economy.trackedPlayers,
-          active_towns: metrics.towny.townCount,
-          active_nations: metrics.towny.nationCount,
-        },
-      },
-      claims: {
-        name: metrics.claims.displayName,
-        players_online: metrics.claims.onlinePlayers,
-        economy: {
-          gold_in_wallets: economyContextForPlayers(metrics.claims.economy).gold_in_wallets_total,
-          players_with_balances: metrics.claims.economy.trackedPlayers,
-        },
-      },
-    },
   };
 }
 

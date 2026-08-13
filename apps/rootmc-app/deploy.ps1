@@ -5,10 +5,10 @@
 $ErrorActionPreference = "Stop"
 $PrevNativeErr = $ErrorActionPreference
 
-$workspaceRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+$workspaceRoot = "F:\RootMC Workspace"
 if (Test-Path (Join-Path $workspaceRoot "scripts\load-rootmc-env.ps1")) {
     . (Join-Path $workspaceRoot "scripts\load-rootmc-env.ps1")
-} elseif (Test-Path (Join-Path $workspaceRoot "emergent-repo\scripts\load-env.ps1")) {
+} elseif (Test-Path (Join-Path $workspaceRoot "scripts\load-env.ps1")) {
     . (Join-Path $workspaceRoot "emergent-repo\scripts\load-env.ps1")
 }
 
@@ -24,7 +24,7 @@ Set-Location $PSScriptRoot
 if (-not $env:REACT_APP_ROOTMC_API)   { $env:REACT_APP_ROOTMC_API   = "https://api.rootmc.net" }
 if (-not $env:REACT_APP_USE_MOCK)     { $env:REACT_APP_USE_MOCK     = "false" }
 if (-not $env:REACT_APP_DEMO_LINK)    { $env:REACT_APP_DEMO_LINK    = "false" }
-if (-not $env:REACT_APP_LIVE_REWARDS) { $env:REACT_APP_LIVE_REWARDS = "true" }
+if (-not $env:REACT_APP_LIVE_REWARDS) { $env:REACT_APP_LIVE_REWARDS = "false" }
 
 Write-Host "Building rootmc-app with:"
 Write-Host "  REACT_APP_ROOTMC_API   = $env:REACT_APP_ROOTMC_API"
@@ -34,24 +34,18 @@ Write-Host "  REACT_APP_LIVE_REWARDS = $env:REACT_APP_LIVE_REWARDS"
 
 if (Get-Command yarn -ErrorAction SilentlyContinue) {
     if (Test-Path "yarn.lock") {
-        $ErrorActionPreference = "Continue"
         yarn install --frozen-lockfile 2>&1 | Out-Host
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         yarn build 2>&1 | Out-Host
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        $ErrorActionPreference = $PrevNativeErr
     }
 }
 if (-not (Test-Path "build\index.html")) {
-    $ErrorActionPreference = "Continue"
     npm install 2>&1 | Out-Host
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    $ErrorActionPreference = $PrevNativeErr
+    npm run build 2>&1 | Out-Host
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
-$ErrorActionPreference = "Continue"
-npm run build 2>&1 | Out-Host
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-$ErrorActionPreference = $PrevNativeErr
 
 $project = "rootmc-app"
 Write-Host "Deploying Pages project $project to RootMC account ..."
@@ -74,3 +68,4 @@ $ErrorActionPreference = $PrevNativeErr
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Done. Attach custom domain app.rootmc.net in Cloudflare Dashboard: Pages > rootmc-app > Custom domains."
+Write-Host "After Worker deploy + D1 0139: set REACT_APP_LIVE_REWARDS=true in Pages env and redeploy."

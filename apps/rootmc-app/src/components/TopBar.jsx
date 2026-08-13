@@ -28,7 +28,7 @@ export default function TopBar() {
       data-testid="top-bar"
     >
       <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")} data-testid="topbar-root-link">
           <div className="h-8 w-8 rounded-md bg-gold/10 border border-gold/30 grid place-items-center">
             <span className="font-display font-extrabold text-gold text-sm tracking-tight">R</span>
           </div>
@@ -61,7 +61,7 @@ export default function TopBar() {
             <button
               className="h-8 w-8 rounded-md overflow-hidden border border-white/10 bg-bg-surface"
               data-testid="user-avatar-button"
-              onClick={() => navigate("/more")}
+              onClick={() => navigate("/rootmc/more")}
               aria-label="Profile"
             >
               <img src={user.head_url} alt={user.minecraft_username} className="h-full w-full object-cover" />

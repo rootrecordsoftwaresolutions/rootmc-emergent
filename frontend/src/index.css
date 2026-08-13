@@ -4,11 +4,12 @@
 
 :root { color-scheme: dark; }
 
-html, body, #root { background: #050505; }
+html, body, #root { background: #000d1a; }
 body {
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  color: #ffffff;
 }
 
 /* Hide scrollbars on horizontal scrollers */
@@ -16,17 +17,20 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Selection */
-::selection { background: rgba(255,184,0,0.35); color: #fff; }
+::selection { background: rgba(0, 229, 255, 0.35); color: #000d1a; }
 
-/* Safe-area padding for bottom nav */
+/* Safe-area padding for bottom nav (mobile only — desktop uses side rail) */
 .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5rem); }
+@media (min-width: 768px) {
+  .pb-safe { padding-bottom: 2rem; }
+}
 .pt-safe { padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem); }
 
 /* Grid pattern for hero backgrounds */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(0, 229, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.06) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -42,4 +46,4 @@ body {
 
 /* Segmented tab focus reset */
 button:focus { outline: none; }
-button:focus-visible { outline: 1px solid rgba(255,184,0,0.6); outline-offset: 2px; }
+button:focus-visible { outline: 1px solid rgba(0, 229, 255, 0.6); outline-offset: 2px; }

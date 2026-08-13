@@ -124,6 +124,7 @@ export async function handleGovernanceRoutes(
       total_votes: power?.total_votes ?? 0,
       vote_points: power?.vote_points ?? 1,
       is_pro: power?.is_pro ?? false,
+      is_lifetime: power?.is_lifetime ?? false,
       pro_multiplier: power?.pro_multiplier ?? 1,
       effective_vote_points: power?.effective_vote_points ?? power?.vote_points ?? 1,
       ec_vote_shard_count: power?.ec_vote_shard_count ?? power?.vote_points ?? 0,
@@ -157,6 +158,7 @@ export async function handleGovernanceRoutes(
         ec_vote_shard_count: r.ec_vote_shard_count,
         effective_vote_points: r.effective_vote_points,
         is_pro: r.is_pro,
+        is_lifetime: r.is_lifetime,
         pro_multiplier: r.pro_multiplier,
         total_votes: r.total_votes,
         site_multiplier: r.site_multiplier,
@@ -177,10 +179,10 @@ export async function handleGovernanceDiscordVote(
     const votingChannelId = str(env.DISCORD_ROOTMC_VOTING_CHANNEL_ID);
     const channelNote = votingChannelId ? `<#${votingChannelId}>` : "**#voting**";
     if (!isGovernanceEligible(power)) {
-      return "Ava Ivy seat is not on the Council snapshot yet (needs Alexrs94 → Ava 10% transfer).";
+      return "Ava Ivy seat is not on the Council snapshot yet (needs Ava 25% locked seat (one-third sum of all others)).";
     }
     return [
-      `**Governance voting power**  -  Ava Ivy (Alex→Ava 10% raw transfer)`,
+      `**Governance voting power**  -  Ava Ivy (Ava 25% locked seat)`,
       "",
       formatGovernancePowerLine(power!),
       "",

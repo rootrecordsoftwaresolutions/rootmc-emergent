@@ -105,11 +105,23 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-/** True at HST calendar midnight (hourly cron at 10:00 UTC). */
-export function isHstMidnightHour(at = new Date()): boolean {
+/** True in the daily-report hour: 11:00–11:09 HST (wake+1h when Ava sleeps on 10:00 policy). */
+export function isHstDailyReportHour(at = new Date()): boolean {
   const hstMs = at.getTime() - HST_OFFSET_MS;
   const hst = new Date(hstMs);
-  return hst.getUTCHours() === 0 && hst.getUTCMinutes() < 10;
+  return hst.getUTCHours() === 11 && hst.getUTCMinutes() < 10;
+}
+
+/** After 11:00 HST — catch-up window for missing daily categories. */
+export function isAfterHstDailyReportOpen(at = new Date()): boolean {
+  const hstMs = at.getTime() - HST_OFFSET_MS;
+  const hst = new Date(hstMs);
+  return hst.getUTCHours() >= 11;
+}
+
+/** @deprecated use isHstDailyReportHour — kept so older callers compile. */
+export function isHstMidnightHour(at = new Date()): boolean {
+  return isHstDailyReportHour(at);
 }
 
 /** Previous completed HST calendar day (midnight → midnight). */

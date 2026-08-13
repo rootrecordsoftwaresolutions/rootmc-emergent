@@ -1,7 +1,7 @@
 /** Player-facing copy rules for public RootMC Discord intelligence reports. */
 
 import type { TreasuryReportBrief } from "./rootmc-treasury";
-import { TREASURY_TYPE_GLOSSARY, TOWNY_INTAKE_GLOSSARY } from "./rootmc-treasury";
+import { TREASURY_TYPE_GLOSSARY } from "./rootmc-treasury";
 import { normalizeDiscordMarkdown } from "./rootmc-discord-markdown";
 
 export const ROOTMC_PLAYER_AUDIENCE_RULES =
@@ -72,7 +72,7 @@ export function economyContextForPlayers(economy: EconomyTotals) {
       total_gold_mined: "All-time gold found/mined on this host  -  audited on rootmc.net/economy; not treasury grants",
       total_gold_minted: "Same as gold mined on this host",
       net_worth:
-        "Total tracked wealth on that host: wallet + inventory/shop stock (Towny) or wallet + physical gold scan (Claims).",
+        "Total tracked wealth: wallet + inventory/shop stock (when tracked).",
     },
   };
 }
@@ -121,16 +121,12 @@ export function treasuryIntelBriefContext(brief: TreasuryReportBrief) {
       prior_month_net: formatReportGold(brief.prior_month_net),
       all_time_net: formatReportGold(brief.all_time_net),
       average_monthly_net: formatReportGold(brief.average_monthly_net),
-      towny_fees_mtd: {
-        new_towns: formatReportGold(brief.towny_intake_mtd.new_town),
-        new_nations: formatReportGold(brief.towny_intake_mtd.new_nation),
-        claims: formatReportGold(brief.towny_intake_mtd.claims),
+      fees_mtd: {
         service_fees: formatReportGold(brief.towny_intake_mtd.service_fees),
-        total: formatReportGold(brief.towny_intake_mtd.total),
-        glossary: TOWNY_INTAKE_GLOSSARY.map((g) => g.label),
+        total: formatReportGold(brief.towny_intake_mtd.service_fees),
       },
       metric_definitions: {
-        server_reserve: "Closed-loop treasury (Server Reserve)  -  taxes, Towny fees, votes, death fees in; grants, loans out",
+        server_reserve: "Closed-loop treasury (Server Reserve)  -  taxes, server fees, votes, death fees in; grants, loans out",
       },
     },
   };
@@ -152,9 +148,9 @@ export function formatTreasuryBriefAppendix(brief: TreasuryReportBrief, syncedAt
     `- **Inflow:** ${formatReportGold(brief.month_inflow)}  -  **Outflow:** ${formatReportGold(brief.month_outflow)}  -  **Net:** ${formatReportGold(brief.month_net)}`,
     inflows.length ? `- **Inflows:** ${inflows.map((r) => `${r.label} ${r.amount}`).join("  -  ")}` : "",
     outflows.length ? `- **Outflows:** ${outflows.map((r) => `${r.label} ${r.amount}`).join("  -  ")}` : "",
-    "",
-    "**Towny fees to reserve (MTD)**",
-    `- Claims ${formatReportGold(brief.towny_intake_mtd.claims)}  -  New towns ${formatReportGold(brief.towny_intake_mtd.new_town)}  -  New nations ${formatReportGold(brief.towny_intake_mtd.new_nation)}  -  Services ${formatReportGold(brief.towny_intake_mtd.service_fees)}  -  **Total** ${formatReportGold(brief.towny_intake_mtd.total)}`,
+    Number(brief.towny_intake_mtd.service_fees) > 0
+      ? `**Fees to reserve (MTD)**\n- Services ${formatReportGold(brief.towny_intake_mtd.service_fees)}`
+      : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -180,7 +176,7 @@ export function hostComparisonForPlayers(
   const netWorthCell = (eco: EconomyTotals) => formatReportGold(Math.max(0, Number(eco.totalNetWorth) || 0));
   return {
     instruction:
-      "REQUIRED: live production is the public realm. Do not frame as dual equal Towny-vs-Claims production. Playtime/votes realm-merged. linked_players realm-wide. Host-specific economy rows may still exist as legacy columns but lead with live production.",
+      "REQUIRED: live production is play.rootmc.net (Root-Ava-Core). Do not mention towns, nations, or claims. Playtime/votes are live-production only.",
     columns: {
       towny: towny.name || "Towny",
       claims: claims.name || "Claims",
@@ -246,7 +242,7 @@ function formatNetWorthLine(eco: EconomyTotals): string {
   return formatReportGold(Math.max(0, Number(eco.totalNetWorth) || 0));
 }
 
-/** Light Towny/Claims glance for the daily summary — economy brief owns the deep metrics. */
+/** Live-production glance for the daily summary — economy brief owns the deep metrics. */
 export function formatEqualDualHostDailyBody(input: {
   linked: number;
   playersWithPlaytime: number;
@@ -262,36 +258,19 @@ export function formatEqualDualHostDailyBody(input: {
     onlinePlayers?: number | null;
   };
 }): string {
-  const line = (label: string, a: string | number, b: string | number) =>
-    `- **${label}:** live **${a}**  |  (legacy Claims column **${b}**)`;
   const topPt = input.playtime[0];
   const playtimeNote = topPt
-    ? `_Realm playtime (shared): **${input.playersWithPlaytime}** players · top **${String(topPt.minecraft_username || "Unknown").trim() || "Unknown"}** at ${formatPlayLabel(Number(topPt.total_playtime_seconds) || 0)}_`
-    : `_Realm playtime (shared): **${input.playersWithPlaytime}** players_`;
-  const land =
-    input.towny.townCount != null
-      ? `- **Towny land:** **${input.towny.townCount ?? 0}** towns / **${input.towny.nationCount ?? 0}** nations / **${input.towny.totalPlots ?? 0}** plots`
-      : "";
+    ? `_Playtime: **${input.playersWithPlaytime}** players · top **${String(topPt.minecraft_username || "Unknown").trim() || "Unknown"}** at ${formatPlayLabel(Number(topPt.total_playtime_seconds) || 0)}_`
+    : `_Playtime: **${input.playersWithPlaytime}** players_`;
 
   return [
     "## Live production",
     "",
-    line(
-      "Gold in wallets",
-      formatReportGold(input.towny.economy.totalBalance),
-      formatReportGold(input.claims.economy.totalBalance),
-    ),
-    line(
-      "Players with wallets",
-      input.towny.economy.trackedPlayers,
-      input.claims.economy.trackedPlayers,
-    ),
-    input.claims.onlinePlayers != null
-      ? `- **Claims online:** **${input.claims.onlinePlayers}**`
-      : "",
-    land,
+    `_play.rootmc.net — RootMC live production (Root-Ava-Core)._`,
     "",
-    `_Linked players (realm-wide): **${input.linked}**_`,
+    `- **Gold in wallets:** **${formatReportGold(input.towny.economy.totalBalance)}** (**${input.towny.economy.trackedPlayers}** players)`,
+    "",
+    `_Linked players: **${input.linked}**_`,
     playtimeNote,
     "",
     `_Full economy detail is in the Economy brief._`,
@@ -363,6 +342,43 @@ export function composeDualHostDailyReportText(opts: {
   return parts.join("\n").trim();
 }
 
+/** Singular live-production economy body — play.rootmc.net only. */
+export function formatLiveProductionEconomyBody(input: {
+  linked: number;
+  playersWithPlaytime: number;
+  playtime: DualHostPlayRow[];
+  live: {
+    economy: EconomyTotals;
+    wallets: NetWorthRow[];
+  };
+}): string {
+  const eco = input.live.economy;
+  const wallets = walletLeaderboardForPlayers(input.live.wallets, 5);
+  const topPt = input.playtime[0];
+  const playtimeNote = topPt
+    ? `_Playtime: **${input.playersWithPlaytime}** players · top **${String(topPt.minecraft_username || "Unknown").trim() || "Unknown"}** at ${formatPlayLabel(Number(topPt.total_playtime_seconds) || 0)}_`
+    : `_Playtime: **${input.playersWithPlaytime}** players_`;
+
+  const lines = [
+    "## Live production",
+    "",
+    `_play.rootmc.net — RootMC live production (Root-Ava-Core)._`,
+    "",
+    `- **Gold in wallets:** **${formatReportGold(eco.totalBalance)}** (**${eco.trackedPlayers}** players)`,
+    `- **Combined net worth:** **${formatNetWorthLine(eco)}**`,
+    `- **Gold mined (all-time):** **${formatReportGold(eco.totalGoldMined ?? eco.totalGoldMinted)}**`,
+    `- **Shop listings:** **${formatShopListings(eco.shopListings)}**`,
+  ];
+  if (wallets.length) {
+    lines.push(
+      `- **Top wallets:** ${wallets.map((w) => `**${w.player}** ${w.wallet_gold}`).join("; ")}`,
+    );
+  }
+  lines.push("", `_Linked players: **${input.linked}**_`, playtimeNote);
+  return lines.join("\n");
+}
+
+/** @deprecated Prefer formatLiveProductionEconomyBody. */
 export function formatEqualDualHostEconomyBody(input: {
   linked: number;
   playersWithPlaytime: number;
@@ -376,52 +392,12 @@ export function formatEqualDualHostEconomyBody(input: {
     wallets: NetWorthRow[];
   };
 }): string {
-  const hostBlock = (
-    title: string,
-    host: {
-      economy: EconomyTotals;
-      wallets: NetWorthRow[];
-    },
-  ) => {
-    const wallets = walletLeaderboardForPlayers(host.wallets, 3);
-    const lines = [
-      `## ${title} Economy`,
-      "",
-      `- **Gold in wallets:** ${formatReportGold(host.economy.totalBalance)} (**${host.economy.trackedPlayers}** players)`,
-      `- **Combined net worth:** ${formatNetWorthLine(host.economy)}`,
-      `- **Gold mined (all-time):** ${formatReportGold(host.economy.totalGoldMined ?? host.economy.totalGoldMinted)}`,
-      `- **Shop listings:** **${formatShopListings(host.economy.shopListings)}**`,
-    ];
-    if (wallets.length) {
-      lines.push(
-        `- **Top wallets:** ${wallets.map((w) => `**${w.player}** ${w.wallet_gold}`).join("; ")}`,
-      );
-    }
-    return lines.join("\n");
-  };
-
-  const comparison = formatHostComparisonAppendix(input.towny.economy, input.claims.economy, {
-    towny: "Towny",
-    claims: "Claims",
+  return formatLiveProductionEconomyBody({
+    linked: input.linked,
+    playersWithPlaytime: input.playersWithPlaytime,
+    playtime: input.playtime,
+    live: input.towny,
   });
-
-  const topPt = input.playtime[0];
-  const playtimeNote = topPt
-    ? `_Realm playtime (shared Towny+Claims): **${input.playersWithPlaytime}** players · top **${String(topPt.minecraft_username || "Unknown").trim() || "Unknown"}** at ${formatPlayLabel(Number(topPt.total_playtime_seconds) || 0)}_`
-    : `_Realm playtime (shared Towny+Claims): **${input.playersWithPlaytime}** players_`;
-
-  return [
-    "## Live production",
-    "",
-    comparison,
-    "",
-    `_Realm-wide linked players (shared): **${input.linked}**_`,
-    playtimeNote,
-    "",
-    hostBlock("Towny", input.towny),
-    "",
-    hostBlock("Claims", input.claims),
-  ].join("\n");
 }
 
 export function composeDualHostEconomyReportText(opts: {
@@ -439,7 +415,7 @@ export function composeDualHostEconomyReportText(opts: {
   const parts = [
     "## Market Overview",
     "",
-    overview || "_See equal Towny / Claims sections below._",
+    overview || "_See Live production below._",
     "",
     opts.dualHostBody.trim(),
   ];
@@ -449,7 +425,7 @@ export function composeDualHostEconomyReportText(opts: {
   return parts.join("\n").trim();
 }
 
-/** Grok prompt + Discord appendix payload for economy_intel briefs (Towny + Claims hosts). */
+/** Grok prompt + Discord appendix payload for economy_intel briefs (singular live production). */
 export function economyIntelBriefContext(
   economy: EconomyTotals,
   netWorthRows: NetWorthRow[],
@@ -488,73 +464,26 @@ export function economyIntelBriefContext(
       playtime: formatPlay(Number(p.total_playtime_seconds) || 0),
     }));
 
-  const claimsEco = claims?.economy || {
-    totalBalance: 0,
-    totalNetWorth: 0,
-    totalGoldMinted: 0,
-    totalGoldMined: 0,
-    shopListings: null,
-    pricedItems: 0,
-    trackedPlayers: 0,
-  };
   const realmLinked = townyMeta?.linked ?? claims?.linked ?? null;
-  const townyWallets = townyMeta?.wallets?.length ? townyMeta.wallets : netWorthRows;
-  const claimsWallets = claims?.wallets?.length ? claims.wallets : claims?.netWorth || [];
+  const liveWallets = townyMeta?.wallets?.length ? townyMeta.wallets : netWorthRows;
 
   return {
     ...treasuryIntelBriefContext(treasury),
     realm_note:
-      "RootMC has two equal public hosts. Playtime and votes are realm-merged (show once, not per host). linked_players is realm-wide. REQUIRED output starts with ## Live production using host_comparison.rows (Towny | Claims). Never invent different linked/playtime counts per host. Never treat wallet totals as combined net worth. Never sum host wallets.",
+      "RootMC live production is play.rootmc.net (Root-Ava-Core / Root-Economy). Use only these figures. Never mention towns, nations, or claims. Never invent a second host. Never treat wallet totals as combined net worth.",
     linked_players: realmLinked,
-    linked_players_note: "Realm-wide Discord-linked Minecraft accounts — identical for Towny and Claims.",
+    linked_players_note: "Discord-linked Minecraft accounts for live production.",
     realm_playtime: {
       players_with_playtime: townyMeta?.playersWithPlaytime ?? null,
       top_playtime: playLeaders(townyMeta?.playtime),
-      note: "Shared Towny+Claims playtime pool — do not duplicate under each host.",
+      note: "Live production playtime pool (Root-Ava-Core).",
     },
-    host_comparison: hostComparisonForPlayers(
-      {
-        name: townyMeta?.displayName || "Towny",
-        economy,
-      },
-      {
-        name: claims?.displayName || "Claims",
-        onlinePlayers: claims?.onlinePlayers ?? null,
-        economy: claimsEco,
-      },
-    ),
-    hosts: {
-      towny: {
-        name: townyMeta?.displayName || "Towny",
-        economy: economyContextForPlayers(economy),
-        top_wallet_balances: walletLeaderboardForPlayers(townyWallets),
-        top_net_worth: netWorthLeaderboardForPlayers(netWorthRows, netWorthLimit),
-      },
-      claims: claims
-        ? {
-            name: claims.displayName || "Claims",
-            join_address: claims.joinAddress,
-            players_online: claims.onlinePlayers,
-            economy: economyContextForPlayers(claims.economy),
-            top_wallet_balances: walletLeaderboardForPlayers(claimsWallets),
-            top_net_worth:
-              Number(claims.economy.totalNetWorth) > 0
-                ? netWorthLeaderboardForPlayers(
-                    (claims.netWorth?.length ? claims.netWorth : claimsWallets).map((row) => ({
-                      ...row,
-                      total_value:
-                        Number(row.total_value) > 0 ? Number(row.total_value) : Number(row.balance_value) || 0,
-                    })),
-                    netWorthLimit,
-                  )
-                : walletLeaderboardForPlayers(claimsWallets, netWorthLimit).map((w) => ({
-                    rank: w.rank,
-                    player: w.player,
-                    net_worth: w.wallet_gold,
-                    wallet_gold: w.wallet_gold,
-                  })),
-          }
-        : null,
+    live_production: {
+      name: townyMeta?.displayName || "RootMC",
+      join: "play.rootmc.net",
+      economy: economyContextForPlayers(economy),
+      top_wallet_balances: walletLeaderboardForPlayers(liveWallets),
+      top_net_worth: netWorthLeaderboardForPlayers(netWorthRows, netWorthLimit),
     },
   };
 }
@@ -594,39 +523,13 @@ export function formatEconomyBriefAppendix(
     ].join("\n");
   };
 
-  const claimsEco = claims?.economy || {
-    totalBalance: 0,
-    totalNetWorth: 0,
-    totalGoldMinted: 0,
-    totalGoldMined: 0,
-    shopListings: null,
-    pricedItems: 0,
-    trackedPlayers: 0,
-  };
-
   const parts = [
     `_Live economy snapshot  -  synced ${syncedAtLabel} HST_`,
     `_**Wallet Gold** = spendable balance only  -  **Net worth** = wallet + items + shop stock (when tracked)_`,
-    `_Towny and Claims compared side-by-side — totals are never combined. Playtime/votes/links are realm-wide._`,
+    `_Live production (play.rootmc.net) — Root-Ava-Core / Root-Economy._`,
     "",
-    formatHostComparisonAppendix(economy, claimsEco, {
-      towny: "Towny",
-      claims: claims?.displayName || "Claims",
-    }),
-    "",
-    hostBlock("Towny detail", economy, netWorthRows, netWorthRows),
+    hostBlock("Live production", economy, netWorthRows, netWorthRows),
   ];
-  if (claims) {
-    parts.push(
-      "",
-      hostBlock(
-        `${claims.displayName || "Claims"} detail`,
-        claims.economy,
-        claims.netWorth,
-        claims.netWorth,
-      ),
-    );
-  }
   if (treasury) {
     parts.push("", formatTreasuryBriefAppendix(treasury, syncedAtLabel));
   }

@@ -62,7 +62,7 @@ export default function More() {
         </div>
       ) : (
         <button
-          onClick={() => nav("/auth")}
+          onClick={() => nav("/rootmc/auth")}
           className="w-full rounded-md bg-gold text-black font-bold py-3 flex items-center justify-center gap-2"
           data-testid="more-signin-btn"
         >
@@ -77,7 +77,7 @@ export default function More() {
           testId="more-leaderboards"
           icon={<Trophy size={16} />}
           label="Leaderboards"
-          onClick={() => nav("/leaderboards")}
+          onClick={() => nav("/rootmc/leaderboards")}
         />
       </Section>
 
@@ -146,7 +146,7 @@ export default function More() {
 
       {user && (
         <button
-          onClick={() => { logout(); nav("/"); }}
+          onClick={() => { logout(); nav("/rootmc"); }}
           data-testid="more-logout-btn"
           className="w-full rounded-md border border-neg/30 bg-neg/5 hover:bg-neg/10 text-neg font-mono uppercase tracking-widest text-xs py-3 flex items-center justify-center gap-2"
         >

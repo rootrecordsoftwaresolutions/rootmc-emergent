@@ -1,6 +1,6 @@
 /**
- * Governance voting power — Vote Shard power in double /ec × Pro → share of 100%.
- * Playtime no longer multiplies. Shards outside /ec do not qualify.
+ * Governance voting power — Vote Shard power in double /ec × membership multiplier → share of 100%.
+ * Pro ×2 · Lifetime ×3 · Pro+Lifetime ×5. Playtime does not multiply.
  * Policy: https://rootmc.net/wiki/constitution/#governance-voting
  */
 
@@ -14,19 +14,36 @@ import {
   VOTE_POINT_BASELINE,
 } from "./rootmc-listing-sites";
 import type { RootMcHyperdriveEnv } from "./rootmc-hyperdrive";
+import {
+  LIFETIME_VOTE_SITE_MULTIPLIER,
+  loadPaidVoteShardBalances,
+} from "./rootmc-paid-vote-shards";
 import { loadSharedPlaytimeMap } from "./rootmc-shared-playtime";
 import { playtimeStatsForPlayer } from "./rootstat-minecraft";
 
-/** Active Pro / Lifetime multiplies EC Vote Shard weight in the raw formula. */
+/** Active Pro (paid / redeemed window, or standalone pro_unlocked) multiplies EC shard weight. */
 export const PRO_VOTE_MULTIPLIER = 2;
+/** Lifetime member multiplies EC shard weight. Stacks additively with Pro → ×5. */
+export const LIFETIME_VOTE_MULTIPLIER = 3;
+/** Pro + Lifetime together (2 + 3). */
+export const PRO_PLUS_LIFETIME_VOTE_MULTIPLIER = 5;
 
-/** Ava Ivy Discord app / bot user — synthetic Council seat. */
+export type MembershipVoteFlags = {
+  pro_unlocked?: number | boolean | null;
+  life_member?: number | boolean | null;
+  pro_paid_until?: string | null;
+  pro_redeemed_until?: string | null;
+};
+
+/** Ava Ivy Discord app / bot user — Council seat. */
 export const AVA_COUNCIL_DISCORD_ID = "1532751879875072070";
-/** Stable fake Minecraft UUID (v4-shaped) for Ava's Council row. */
-export const AVA_COUNCIL_UUID = "a0a10000-0000-4000-a000-000000000001";
-export const AVA_COUNCIL_USERNAME = "Ava Ivy";
-/** Ava holds this fraction of total Council share at all times (= sum of all other voters). */
-export const AVA_EQUAL_SHARE_FRAC = 0.5;
+/** Ava_Ivy Microsoft account (ex-wildecho94). */
+export const AVA_COUNCIL_UUID = "78c3de61-0fd6-4800-9eda-cc178eaae34b";
+/** Retired synthetic Council UUID — still treated as Ava if present. */
+export const AVA_COUNCIL_UUID_LEGACY = "a0a10000-0000-4000-a000-000000000001";
+export const AVA_COUNCIL_USERNAME = "Ava_Ivy";
+/** Ava holds this fraction of total Council share at all times. */
+export const AVA_EQUAL_SHARE_FRAC = 0.25;
 /** @deprecated Use {@link AVA_EQUAL_SHARE_FRAC}. Kept so old imports keep compiling. */
 export const ALEX_TO_AVA_SHARE_FRAC = AVA_EQUAL_SHARE_FRAC;
 export const ALEX_TRANSFER_USERNAME = "alexrs94";
@@ -52,17 +69,21 @@ export type GovernancePowerRow = {
   vote_points: number;
   /** Same as vote_points — explicit EC shard weight. */
   ec_vote_shard_count: number;
-  /** 1 normally; {@link PRO_VOTE_MULTIPLIER} when Pro is active. */
+  /** Paid Stripe / donation shards ($1 = 100). Not weekly awards. */
+  paid_vote_shards: number;
+  /** 1 / Pro ×2 / Lifetime ×3 / Pro+Lifetime ×5. */
   pro_multiplier: number;
-  /** True when RootMC Pro / Lifetime / active Pro window applies. */
+  /** True when standalone Pro (subscription / paid / redeemed) applies — not Lifetime-only. */
   is_pro: boolean;
+  /** True when RootMC Lifetime is active. */
+  is_lifetime: boolean;
   /** ec_vote_shard_count × pro_multiplier. */
   effective_vote_points: number;
   /** Additive Ava-reaction quality bonus (capped). */
   ava_reaction_bonus: number;
   ava_reaction_good: number;
   ava_reaction_bad: number;
-  /** @deprecated Use vote_points — kept for API compat. */
+  /** Listing vote-site multiplier (Lifetime ×2, else 1). */
   site_multiplier: number;
   raw_weight: number;
   share_percent: number;
@@ -84,25 +105,58 @@ function normalizeUuid(raw: unknown): string {
   return str(raw).toLowerCase();
 }
 
+export function isAvaCouncilUuid(uuid: unknown): boolean {
+  const u = normalizeUuid(uuid);
+  return u === normalizeUuid(AVA_COUNCIL_UUID) || u === normalizeUuid(AVA_COUNCIL_UUID_LEGACY);
+}
+
 /** @deprecated Net worth is not used in governance voting power. */
 export function stakeFromNetWorth(_netWorth: number): number {
   return 0;
 }
 
-export function isProAccessActive(flags: {
-  pro_unlocked?: number | boolean | null;
-  life_member?: number | boolean | null;
-  pro_paid_until?: string | null;
-  pro_redeemed_until?: string | null;
-} | null | undefined, nowMs = Date.now()): boolean {
+export function isLifetimeMember(flags: MembershipVoteFlags | null | undefined): boolean {
   if (!flags) return false;
-  if (Boolean(flags.life_member) || Number(flags.life_member) === 1) return true;
-  if (Boolean(flags.pro_unlocked) || Number(flags.pro_unlocked) === 1) return true;
+  return Boolean(flags.life_member) || Number(flags.life_member) === 1;
+}
+
+/** Paid Stripe window only — weekly award `pro_redeemed_until` does not count for vote shards. */
+export function hasActiveProWindow(flags: MembershipVoteFlags | null | undefined, nowMs = Date.now()): boolean {
+  if (!flags) return false;
   const paid = flags.pro_paid_until ? Date.parse(String(flags.pro_paid_until)) : NaN;
   if (Number.isFinite(paid) && paid > nowMs) return true;
-  const redeemed = flags.pro_redeemed_until ? Date.parse(String(flags.pro_redeemed_until)) : NaN;
-  if (Number.isFinite(redeemed) && redeemed > nowMs) return true;
   return false;
+}
+
+/**
+ * Pro product for vote math: paid Stripe window or standalone pro_unlocked (subscription).
+ * Weekly award Pro does not grant shards or ×2. Lifetime-only is not a second Pro product.
+ */
+export function isProForVote(flags: MembershipVoteFlags | null | undefined, nowMs = Date.now()): boolean {
+  if (!flags) return false;
+  if (hasActiveProWindow(flags, nowMs)) return true;
+  const unlocked = Boolean(flags.pro_unlocked) || Number(flags.pro_unlocked) === 1;
+  if (!unlocked) return false;
+  if (isLifetimeMember(flags)) return false;
+  return true;
+}
+
+/** Perk access (cosmetics / homes) — Lifetime still counts as Pro. */
+export function isProAccessActive(flags: MembershipVoteFlags | null | undefined, nowMs = Date.now()): boolean {
+  if (!flags) return false;
+  if (isLifetimeMember(flags)) return true;
+  if (Boolean(flags.pro_unlocked) || Number(flags.pro_unlocked) === 1) return true;
+  return hasActiveProWindow(flags, nowMs);
+}
+
+/** Pay-to-steer multiplier: Pro ×2, Lifetime ×3, both ×5, else 1. */
+export function voteMembershipMultiplier(flags: MembershipVoteFlags | null | undefined, nowMs = Date.now()): number {
+  const pro = isProForVote(flags, nowMs);
+  const life = isLifetimeMember(flags);
+  if (pro && life) return PRO_PLUS_LIFETIME_VOTE_MULTIPLIER;
+  if (life) return LIFETIME_VOTE_MULTIPLIER;
+  if (pro) return PRO_VOTE_MULTIPLIER;
+  return 1;
 }
 
 async function allTimeListingVoteCount(db: D1Database, uuid: string): Promise<number> {
@@ -184,11 +238,11 @@ export async function upsertEcVoteShards(
   return n;
 }
 
-async function loadProFlagsByAccountId(
+async function loadMembershipFlagsByAccountId(
   db: D1Database,
   accountIds: string[],
-): Promise<Map<string, boolean>> {
-  const out = new Map<string, boolean>();
+): Promise<Map<string, MembershipVoteFlags>> {
+  const out = new Map<string, MembershipVoteFlags>();
   const ids = [...new Set(accountIds.map((a) => str(a)).filter(Boolean))];
   if (!ids.length) return out;
   const chunkSize = 80;
@@ -210,7 +264,12 @@ async function loadProFlagsByAccountId(
         pro_redeemed_until: string | null;
       }>();
     for (const row of results || []) {
-      out.set(str(row.account_id), isProAccessActive(row));
+      out.set(str(row.account_id), {
+        pro_unlocked: row.pro_unlocked,
+        life_member: row.life_member,
+        pro_paid_until: row.pro_paid_until,
+        pro_redeemed_until: row.pro_redeemed_until,
+      });
     }
   }
   return out;
@@ -241,16 +300,23 @@ export async function governancePowerForDiscordId(
 }
 
 /**
- * Ava Ivy synthetic Council seat: always holds {@link AVA_EQUAL_SHARE_FRAC} (50%).
- * Her raw weight equals the sum of every other eligible voter — she does not drain Alex.
- * Example: A100 + B200 + C100 → Ava 400 → Ava 50% of 800.
+ * Ava Ivy synthetic Council seat: always holds {@link AVA_EQUAL_SHARE_FRAC} (25%).
+ * Raw weight = frac/(1-frac) × sum of every other eligible voter — she does not drain Alex.
+ * Example: A100 + B200 + C100 → Ava 133.33 → Ava 25% of 533.33.
  */
+export function avaSeatRawFromOthers(othersTotal: number, frac = AVA_EQUAL_SHARE_FRAC): number {
+  const o = Number(othersTotal) || 0;
+  const f = Number(frac) || 0;
+  if (o <= 0 || f <= 0 || f >= 1) return 0;
+  return Math.round(((f / (1 - f)) * o) * 100) / 100;
+}
+
 export function applyAvaEqualCouncilSeat(rows: GovernancePowerRow[]): void {
   for (let i = rows.length - 1; i >= 0; i--) {
     const r = rows[i];
     if (
       str(r.discord_user_id) === AVA_COUNCIL_DISCORD_ID ||
-      normalizeUuid(r.minecraft_uuid) === normalizeUuid(AVA_COUNCIL_UUID)
+      isAvaCouncilUuid(r.minecraft_uuid)
     ) {
       rows.splice(i, 1);
     }
@@ -260,7 +326,7 @@ export function applyAvaEqualCouncilSeat(rows: GovernancePowerRow[]): void {
     Math.round(rows.reduce((s, r) => s + r.raw_weight, 0) * 100) / 100;
   if (othersTotal <= 0) return;
 
-  const avaRaw = othersTotal; // exactly 50% when added back
+  const avaRaw = avaSeatRawFromOthers(othersTotal);
   const shardWeight = Math.max(1, Math.round(avaRaw));
 
   rows.push({
@@ -275,13 +341,15 @@ export function applyAvaEqualCouncilSeat(rows: GovernancePowerRow[]): void {
     total_votes: shardWeight,
     vote_points: shardWeight,
     ec_vote_shard_count: shardWeight,
+    paid_vote_shards: 0,
     pro_multiplier: 1,
     is_pro: false,
+    is_lifetime: false,
     effective_vote_points: shardWeight,
     ava_reaction_bonus: 0,
     ava_reaction_good: 0,
     ava_reaction_bad: 0,
-    site_multiplier: shardWeight,
+    site_multiplier: 1,
     raw_weight: avaRaw,
     share_percent: 0,
     sites_voted: [],
@@ -289,7 +357,7 @@ export function applyAvaEqualCouncilSeat(rows: GovernancePowerRow[]): void {
 }
 
 /**
- * @deprecated Name kept for call-sites — now applies {@link applyAvaEqualCouncilSeat} (50%).
+ * @deprecated Name kept for call-sites — now applies {@link applyAvaEqualCouncilSeat} (25%).
  */
 export function applyAlexToAvaVoteTransfer(rows: GovernancePowerRow[]): void {
   applyAvaEqualCouncilSeat(rows);
@@ -316,11 +384,12 @@ export async function computeGovernancePowerSnapshot(
     }>();
 
   const sharedMap = env ? await loadSharedPlaytimeMap(env) : null;
-  const proByAccount = await loadProFlagsByAccountId(
+  const flagsByAccount = await loadMembershipFlagsByAccountId(
     db,
     (links || []).map((l) => l.account_id),
   );
   const ecWeights = await loadEcVoteShardWeights(db);
+  const paidShards = await loadPaidVoteShardBalances(db);
   const reactionBonus = await loadAvaReactionBonuses(db);
 
   const rows: GovernancePowerRow[] = [];
@@ -329,7 +398,8 @@ export async function computeGovernancePowerSnapshot(
     if (!uuid) continue;
 
     const ecWeight = ecWeights.get(uuid) || 0;
-    if (ecWeight <= 0) continue;
+    const paid = paidShards.get(uuid) || 0;
+    if (ecWeight <= 0 && paid <= 0) continue;
 
     const shared = sharedMap?.get(uuid) || null;
     const playtime = shared ? null : await playtimeStatsForPlayer(db, serverId, uuid);
@@ -340,9 +410,14 @@ export async function computeGovernancePowerSnapshot(
 
     const totalVotes = await allTimeListingVoteCount(db, uuid);
     const sites = await allTimeListingCanonicalSites(db, uuid);
-    const isPro = proByAccount.get(str(link.account_id)) === true;
-    const proMultiplier = isPro ? PRO_VOTE_MULTIPLIER : 1;
-    const effective = ecWeight * proMultiplier;
+    const flags = flagsByAccount.get(str(link.account_id)) || {};
+    const isPro = isProForVote(flags);
+    const isLifetime = isLifetimeMember(flags);
+    const siteMult = isLifetime ? LIFETIME_VOTE_SITE_MULTIPLIER : 1;
+    const siteBonus = totalVotes * Math.max(0, siteMult - 1);
+    const shardScore = ecWeight + paid + siteBonus;
+    const proMultiplier = voteMembershipMultiplier(flags);
+    const effective = shardScore * proMultiplier;
     const discordId = str(link.discord_user_id) || "";
     const rx = reactionBonus.get(discordId) || {
       quality_score: 0,
@@ -366,15 +441,17 @@ export async function computeGovernancePowerSnapshot(
       net_worth: 0,
       stake: 0,
       total_votes: totalVotes,
-      vote_points: ecWeight,
+      vote_points: shardScore,
       ec_vote_shard_count: ecWeight,
+      paid_vote_shards: paid,
       pro_multiplier: proMultiplier,
       is_pro: isPro,
+      is_lifetime: isLifetime,
       effective_vote_points: effective,
       ava_reaction_bonus: Math.round(bonus * 100) / 100,
       ava_reaction_good: Math.max(0, Math.floor(Number(rx.good_count) || 0)),
       ava_reaction_bad: Math.max(0, Math.floor(Number(rx.bad_count) || 0)),
-      site_multiplier: ecWeight,
+      site_multiplier: siteMult,
       raw_weight: Math.round(raw * 100) / 100,
       share_percent: 0,
       sites_voted: sites,
@@ -434,17 +511,23 @@ export function formatGovernancePowerLine(row: GovernancePowerRow): string {
     row.sites_voted.length > 0
       ? row.sites_voted.slice(0, 4).join(", ") + (row.sites_voted.length > 4 ? "..." : "")
       : "none (run /vote on listing sites)";
-  const proNote = row.is_pro
-    ? ` · Pro ×${row.pro_multiplier} (pay to steer) → effective ${row.effective_vote_points}`
-    : "";
+  const tier =
+    row.is_pro && row.is_lifetime
+      ? `Pro+Lifetime ×${row.pro_multiplier}`
+      : row.is_lifetime
+        ? `Lifetime ×${row.pro_multiplier}`
+        : row.is_pro
+          ? `Pro ×${row.pro_multiplier}`
+          : "";
+  const proNote = tier ? ` · ${tier} (pay to steer) → effective ${row.effective_vote_points}` : "";
   const rxNote =
     Number(row.ava_reaction_bonus) > 0
       ? ` · Ava reaction bonus +${row.ava_reaction_bonus} (👍${row.ava_reaction_good}/👎${row.ava_reaction_bad})`
       : "";
   return [
-    `Vote Shards in /ec: ${row.ec_vote_shard_count} (listing votes minted: ${row.total_votes})${proNote}${rxNote}`,
+    `Vote score: ${row.vote_points} (EC ${row.ec_vote_shard_count} + paid ${row.paid_vote_shards ?? 0}; listing votes ${row.total_votes} ×${row.site_multiplier || 1})${proNote}${rxNote}`,
     `Listing sites (all-time): ${sites}`,
-    `raw = ec_vote_shard_count × pro_multiplier + ava_reaction_bonus → share ${row.share_percent}%`,
+    `raw = vote_score × vote_multiplier (Pro ×2 / Lifetime ×3 / both ×5; Lifetime vote-sites ×2) + ava_reaction_bonus → share ${row.share_percent}%`,
   ].join("\n");
 }
 

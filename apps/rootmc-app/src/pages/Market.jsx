@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { fmtPct, deltaColor } from "../lib/format";
+import { fmtPct } from "../lib/format";
 import Sparkline from "../components/Sparkline";
 import SyncBadge from "../components/SyncBadge";
 import PullIndicator from "../components/PullIndicator";
@@ -147,7 +147,7 @@ export default function Market() {
             return (
               <button
                 key={it.id}
-                onClick={() => nav(`/market/${it.ticker}`)}
+                onClick={() => nav(`/rootmc/market/${it.ticker}`)}
                 data-testid={`market-row-${it.ticker}`}
                 className="w-full grid grid-cols-[1fr_auto_auto] items-center gap-3 px-3 py-3 hover:bg-bg-elev/60 transition-colors text-left"
               >

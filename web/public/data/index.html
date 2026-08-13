@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data — RootMC</title>
-  <meta name="description" content="Per-server live data from LIVE_DB (Hyperdrive MySQL mirrors) — Towny, Claims, and connected hosts.">
+  <meta name="description" content="Per-server live data from LIVE_DB (Hyperdrive MySQL mirrors) — live RootMC and connected hosts.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <meta name="theme-color" content="#0a0f10">
+  <meta name="theme-color" content="#000d1a">
   <link rel="canonical" href="https://rootmc.net/data/">
-  <link rel="stylesheet" href="/styles/rootmc.css?v=20260727data">
-  <link rel="stylesheet" href="/styles/data-hub.css?v=20260727data">
+  <link rel="stylesheet" href="/styles/rootmc.css?v=20260812ava">
+  <link rel="stylesheet" href="/styles/data-hub.css?v=20260812ava">
 </head>
 <body>
   <header class="rmc-header">
@@ -31,29 +31,29 @@
 
   <main class="container data-hub-main">
     <p class="wiki-breadcrumb"><a href="/">Home</a> / Data</p>
-    <h1 class="wiki-page-title"><span class="gold">Data</span></h1>
-    <p class="page-lead">Live per-server datasets from <strong>LIVE_DB</strong> (Hyperdrive → rootmc-live). Archive of the previous site: <a href="/old/">/old/</a>.</p>
+    <h1 class="wiki-page-title">Data</h1>
+    <p class="page-lead">Live Gold and host telemetry for <strong>play.rootmc.net</strong>. Status: <a href="https://rootrecord.info/ava/status">Ava status</a>. Previous site archive: <a href="/old/">/old/</a>.</p>
 
     <nav class="economy-scope-nav" aria-label="Data scopes" style="margin-top:1.5rem">
-      <a class="economy-scope-card" href="/data/towny/">
-        <span class="economy-scope-mark" aria-hidden="true">T</span>
-        <span class="economy-scope-label">Towny</span>
-        <span class="economy-scope-desc">Official Towny host — balances, playtime, gold found, shops, times.</span>
+      <a class="economy-scope-card" href="/economy/">
+        <span class="economy-scope-mark" aria-hidden="true">G</span>
+        <span class="economy-scope-label">Economy</span>
+        <span class="economy-scope-desc">Live Gold wallets, claim banks, Server Reserve — play.rootmc.net.</span>
       </a>
-      <a class="economy-scope-card" href="/data/claims/">
-        <span class="economy-scope-mark economy-scope-mark--claims" aria-hidden="true">C</span>
-        <span class="economy-scope-label">Claims</span>
-        <span class="economy-scope-desc">Official Claims host — same LIVE_DB mirror sets.</span>
+      <a class="economy-scope-card" href="https://ava.rootmc.net/minecraft">
+        <span class="economy-scope-mark economy-scope-mark--official" aria-hidden="true">▶</span>
+        <span class="economy-scope-label">Minecraft</span>
+        <span class="economy-scope-desc">play.rootmc.net ping, players, and world pulse.</span>
       </a>
-      <a class="economy-scope-card" href="/data/official/">
-        <span class="economy-scope-mark economy-scope-mark--official" aria-hidden="true">Σ</span>
-        <span class="economy-scope-label">Official combined</span>
-        <span class="economy-scope-desc">Towny + Claims rollup where mirrors allow.</span>
+      <a class="economy-scope-card" href="https://rootrecord.info/ava/status">
+        <span class="economy-scope-mark economy-scope-mark--all" aria-hidden="true">☀</span>
+        <span class="economy-scope-label">Ava status</span>
+        <span class="economy-scope-desc">Solar, battery, CPU, and Current Gaming Bonus.</span>
       </a>
-      <a class="economy-scope-card" href="/data/servers/">
-        <span class="economy-scope-mark economy-scope-mark--all" aria-hidden="true">◇</span>
-        <span class="economy-scope-label">All servers</span>
-        <span class="economy-scope-desc">Every host in LIVE_DB server_connections.</span>
+      <a class="economy-scope-card" href="/wiki/">
+        <span class="economy-scope-mark economy-scope-mark--claims" aria-hidden="true">W</span>
+        <span class="economy-scope-label">Wiki</span>
+        <span class="economy-scope-desc">Player guide, economy rules, and how Gold works.</span>
       </a>
     </nav>
   </main>
@@ -63,6 +63,6 @@
       <p>RootMC · Data · LIVE_DB</p>
     </div>
   </footer>
-  <script src="/scripts/site-nav.js?v=20260727data" defer></script>
+  <script src="/scripts/site-nav.js?v=20260812ava" defer></script>
 </body>
 </html>

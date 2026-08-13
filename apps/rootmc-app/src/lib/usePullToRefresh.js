@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Mobile-first pull-to-refresh hook.
@@ -16,14 +16,29 @@ export function usePullToRefresh(onRefresh, threshold = 72) {
   const [pullDist, setPullDist] = useState(0);
   const startY = useRef(null);
   const active = useRef(false);
+  const pullDistRef = useRef(0);
+  const refreshingRef = useRef(false);
+  const onRefreshRef = useRef(onRefresh);
 
-  const onTouchStart = (e) => {
-    if (window.scrollY > 0 || refreshing) return;
+  useEffect(() => {
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
+
+  useEffect(() => {
+    pullDistRef.current = pullDist;
+  }, [pullDist]);
+
+  useEffect(() => {
+    refreshingRef.current = refreshing;
+  }, [refreshing]);
+
+  const onTouchStart = useCallback((e) => {
+    if (window.scrollY > 0 || refreshingRef.current) return;
     startY.current = e.touches[0].clientY;
     active.current = true;
-  };
+  }, []);
 
-  const onTouchMove = (e) => {
+  const onTouchMove = useCallback((e) => {
     if (!active.current || startY.current === null) return;
     const dy = e.touches[0].clientY - startY.current;
     if (dy > 0 && window.scrollY <= 0) {
@@ -32,14 +47,16 @@ export function usePullToRefresh(onRefresh, threshold = 72) {
     } else {
       setPullDist(0);
     }
-  };
+  }, [threshold]);
 
-  const onTouchEnd = async () => {
+  const onTouchEnd = useCallback(async () => {
     if (!active.current) return;
     active.current = false;
-    if (pullDist >= threshold && !refreshing) {
+    if (pullDistRef.current >= threshold && !refreshingRef.current) {
       setRefreshing(true);
-      try { await onRefresh(); } finally {
+      try {
+        await onRefreshRef.current();
+      } finally {
         setRefreshing(false);
         setPullDist(0);
       }
@@ -47,7 +64,7 @@ export function usePullToRefresh(onRefresh, threshold = 72) {
       setPullDist(0);
     }
     startY.current = null;
-  };
+  }, [threshold]);
 
   useEffect(() => {
     window.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -58,7 +75,7 @@ export function usePullToRefresh(onRefresh, threshold = 72) {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [pullDist, refreshing]);
+  }, [onTouchStart, onTouchMove, onTouchEnd]);
 
   return { refreshing, pullDist, threshold };
 }

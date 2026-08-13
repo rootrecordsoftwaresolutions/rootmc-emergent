@@ -72,7 +72,7 @@ export default function Portfolio() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="px-4 pt-4 pb-4 space-y-5 relative"
+      className="px-4 md:px-6 pt-4 md:pt-6 pb-4 space-y-5 relative"
       data-testid="portfolio-screen"
     >
       <PullIndicator {...ptr} />

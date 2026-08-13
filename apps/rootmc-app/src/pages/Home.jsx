@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { fmtG, fmtPct, deltaColor } from "../lib/format";
+import { fmtG, fmtPct } from "../lib/format";
 import Sparkline from "../components/Sparkline";
 import SyncBadge from "../components/SyncBadge";
 import PullIndicator from "../components/PullIndicator";
@@ -23,19 +23,19 @@ export default function Home() {
   const [syncedAt, setSyncedAt] = useState(null);
 
   const load = useCallback(async () => {
-    const [ec, mk, st, rp] = await Promise.allSettled([
-      api.get("/economy/overview"),
-      api.get("/market/items?sort=gainers"),
-      api.get("/server/status"),
-      api.get("/daily-report/latest"),
-    ]);
-    if (ec.status === "fulfilled") setEconomy(ec.value.data);
-    if (mk.status === "fulfilled") setMarket(mk.value.data.items);
-    if (st.status === "fulfilled") setStatus(st.value.data);
-    if (rp.status === "fulfilled") setReport(rp.value.data);
-    if (ec.status === "fulfilled" || mk.status === "fulfilled" || st.status === "fulfilled") {
+    try {
+      const [ec, mk, st, rp] = await Promise.all([
+        api.get("/economy/overview"),
+        api.get("/market/items?sort=gainers"),
+        api.get("/server/status"),
+        api.get("/daily-report/latest"),
+      ]);
+      setEconomy(ec.data);
+      setMarket(mk.data.items);
+      setStatus(st.data);
+      setReport(rp.data);
       setSyncedAt(Date.now());
-    }
+    } catch { /* noop */ }
     if (user) {
       try {
         const { data } = await api.get("/checkin/status");
@@ -68,7 +68,7 @@ export default function Home() {
             </div>
           </div>
           <button
-            onClick={() => nav("/portfolio")}
+            onClick={() => nav("/rootmc/portfolio")}
             className="ml-auto rounded-md bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-2 text-xs font-mono uppercase tracking-widest"
             data-testid="home-view-portfolio-btn"
           >
@@ -77,7 +77,7 @@ export default function Home() {
         </div>
       ) : (
         <button
-          onClick={() => nav("/auth")}
+          onClick={() => nav("/rootmc/auth")}
           className="w-full rounded-md bg-gold hover:bg-[#E6A600] text-black font-bold py-3 flex items-center justify-center gap-2"
           data-testid="home-signin-btn"
         >
@@ -147,7 +147,7 @@ export default function Home() {
       <div className="grid grid-cols-2 gap-3">
         <ActionTile
           testId="quick-checkin"
-          onClick={() => nav("/rewards")}
+          onClick={() => nav("/rootmc/rewards")}
           title="Daily Check-In"
           tag={checkin && !checkin.can_claim ? "CLAIMED" : "AVAILABLE"}
           reward={checkin ? `+${checkin.next_reward.gold} G` : "+10 G"}
@@ -156,7 +156,7 @@ export default function Home() {
         />
         <ActionTile
           testId="quick-vote"
-          onClick={() => nav("/rewards?tab=vote")}
+          onClick={() => nav("/rootmc/rewards?tab=vote")}
           title="Vote Sites"
           tag="5 SITES"
           reward="+95 G / day"
@@ -169,11 +169,11 @@ export default function Home() {
       <SectionHeader
         title="Top Gainers"
         action="See market"
-        onAction={() => nav("/market?sort=gainers")}
+        onAction={() => nav("/rootmc/market?sort=gainers")}
       />
       <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
         {gainers.map((it) => (
-          <MoverRow key={it.id} item={it} onClick={() => nav(`/market/${it.ticker}`)} />
+          <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
         ))}
       </div>
 
@@ -185,7 +185,7 @@ export default function Home() {
       />
       <div className="rounded-md border border-white/10 overflow-hidden divide-y divide-white/5">
         {losers.map((it) => (
-          <MoverRow key={it.id} item={it} onClick={() => nav(`/market/${it.ticker}`)} />
+          <MoverRow key={it.id} item={it} onClick={() => nav(`/rootmc/market/${it.ticker}`)} />
         ))}
       </div>
 

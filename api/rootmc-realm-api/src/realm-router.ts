@@ -93,8 +93,7 @@ import { handleDeveloperWebRoutes } from "./rootmc-developer-web";
 import { handleAccountWebRoutes } from "./rootmc-account-web";
 import { handleLicenseRoutes } from "./rootmc-license-bind";
 import { handleTransferMeshRoutes } from "./rootmc-transfer-mesh";
-import { handleDevWorkstationRoutes } from "./rootmc-dev-workstation";
-import { handleAvaCronKickRoutes } from "./rootmc-ava-cron-kick";
+import { handleDevWorkstationRoutes, validateDevWorkstationAuth } from "./rootmc-dev-workstation";
 import { handleConnectionPreferenceRoutes } from "./rootmc-connection-preference";
 import { handleHostMetricsRoutes } from "./rootmc-host-metrics";
 import { handleHostSiteRoutes } from "./rootmc-host-site";
@@ -732,6 +731,43 @@ export async function handleRequest(
       return json({ ok: result.ok, category, detail: result.detail }, result.ok ? 200 : 503);
     }
 
+    if (method === "POST" && sub === "/rootmc/ava/economy-brief") {
+      if (!validateDevWorkstationAuth(request, env)) {
+        return json({ ok: false, detail: "Unauthorized." }, 401);
+      }
+      let force = false;
+      let reason = "ava";
+      try {
+        const body = (await request.json()) as { force?: boolean; reason?: string };
+        force = Boolean(body?.force);
+        reason = String(body?.reason || "ava").trim() || "ava";
+      } catch {
+        /* empty body ok */
+      }
+      const serverId = await resolveServerId(env.DB);
+      const dayKey = previousHstDayKey();
+      if (force) {
+        await env.DB.prepare(
+          `DELETE FROM rootmc_daily_category_reports WHERE server_id = ? AND day_key = ? AND category = ?`,
+        )
+          .bind(serverId, dayKey, "economy_intel")
+          .run();
+      }
+      const result = await runRootMcDailyCategoryReport(env, "economy_intel", serverId);
+      return json(
+        {
+          ok: result.ok,
+          category: "economy_intel",
+          dayKey,
+          server_id: serverId,
+          force,
+          reason,
+          detail: result.detail,
+        },
+        result.ok ? 200 : 503,
+      );
+    }
+
     if (method === "POST" && sub.startsWith("/rootmc/daily-report/trigger-category/")) {
       const server = await validateServerAuth(env, request);
       if (server instanceof Response) return server;
@@ -1048,8 +1084,6 @@ export async function handleRequest(
     const connectionPrefRes = await handleConnectionPreferenceRoutes(request, env, sub, method);
     if (connectionPrefRes) return connectionPrefRes;
 
-    const avaCronRes = await handleAvaCronKickRoutes(request, env, sub, method, ctx);
-    if (avaCronRes) return avaCronRes;
     const devWorkstationRes = await handleDevWorkstationRoutes(request, env, sub, method);
     if (devWorkstationRes) return devWorkstationRes;
 

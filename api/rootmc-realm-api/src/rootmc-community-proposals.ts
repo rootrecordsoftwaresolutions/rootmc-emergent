@@ -560,7 +560,7 @@ export async function castProposalVote(
     if (voteWeight <= 0) {
       return {
         ok: false,
-        detail: "Ava is not eligible yet  -  Alex→Ava 10% transfer needs Alexrs94 on the Council snapshot.",
+        detail: "Ava is not eligible yet — 25% Council seat needs at least one other voter with Vote Shards in /ec.",
       };
     }
     voterUuid = AVA_COUNCIL_UUID;

@@ -1,9 +1,20 @@
+# Emergent Root Record SPA (apex homepage)
+/rootrecord / 301
+/rootrecord/ / 301
+/rootrecord/pricing /pricing 301
+/rootrecord/about /about 301
+
 # Root Goals app lives on goals.rootrecord.info (not apex /goals/*).
 /goals/* https://goals.rootrecord.info/goals/:splat 302
 
 /discord-verify.html /discord-verify 308
 /privacy.html /privacy 308
 /terms.html /terms 308
+/account.html /account 308
+/account-signup.html /account-signup 308
+/account-reset.html /account-reset 308
+/contact.html /contact 308
+/faq.html /faq 308
 /root-units.html /root-units 308
 /beta-tester-rewards /root-units 301
 /beta-tester-rewards/ /root-units 301

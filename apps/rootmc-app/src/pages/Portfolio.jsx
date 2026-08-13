@@ -45,7 +45,7 @@ export default function Portfolio() {
         <h2 className="font-display font-bold text-xl">Sign in to see your portfolio</h2>
         <p className="text-sm text-text-secondary">Link your Minecraft account with a 6-character /link code to unlock net worth, holdings, and history.</p>
         <button
-          onClick={() => nav("/auth")}
+          onClick={() => nav("/rootmc/auth")}
           className="mx-auto rounded-md bg-gold text-black font-bold px-6 py-3 hover:bg-[#E6A600] transition-colors"
           data-testid="portfolio-signin-btn"
         >
@@ -157,7 +157,7 @@ export default function Portfolio() {
             return (
               <button
                 key={h.ticker}
-                onClick={() => nav(`/market/${h.ticker}`)}
+                onClick={() => nav(`/rootmc/market/${h.ticker}`)}
                 data-testid={`holding-${h.ticker}`}
                 className="w-full grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-3 hover:bg-bg-elev/60 transition-colors text-left"
               >
